@@ -218,7 +218,5 @@ public class ApplicationService {
         }
         return result.toString();
 	}//end of method getHttpResponse
-	
-	
-
+	 
 }

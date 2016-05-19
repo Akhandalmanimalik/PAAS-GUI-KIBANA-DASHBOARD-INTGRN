@@ -30,12 +30,22 @@ import static com.getusroi.paas.helper.PAASConstant.*;
  */
 public class PaasUserRegisterAndLoginDAO {
 	 static final Logger logger = LoggerFactory.getLogger(PaasUserRegisterAndLoginDAO.class);
-	 private static final String REGISTER_USER_QUERY="insert into register(company_name,company_address,email,password) values(?,?,?,?)";
-	 private static final String ALL_REGISTERED_USER_QUERY="select * from register";
-	 private static final String DELETE_RESGISTERED_USER_BY_EMAIL_COMPANYNAME="delete from register where email=? AND company_name=?";
-	 private static final String LOGIN_QUERY="select * from register where email=? AND password=?";
-	 private static final String CHECKEMAIL_EXIST_QUERY="select email from register where email=?";
-	 private static final String CHECKEMAIl_AND_PASSWORD_EXIST_QUERY="select * from register where email=? and password=?";
+	 private static final String REGISTER_USER_QUERY="insert into tenant(tenant_name,tenant_email,company_name,company_address,createdDTM) values(?,?,?,?,NOW())";
+	 private static final String ALL_REGISTERED_USER_QUERY="select * from tenant";
+	 private static final String DELETE_RESGISTERED_USER_BY_EMAIL_COMPANYNAME="delete from tenant where tenant_email=? AND company_name=?";
+	 private static final String LOGIN_QUERY="select * from tenant where tenant_email=? AND password=?";
+	 private static final String CHECKEMAIL_EXIST_QUERY="select tenant_email from tenant where tenant_email=?";
+	 private static final String CHECKEMAIl_AND_PASSWORD_EXIST_QUERY="select * from tenant where tenant_email=? and password=?";
+	 
+	 public static void main(String[] args) throws DataBaseOperationFailedException {
+		 PaasUserRegister registerPaasUser = new PaasUserRegister();
+		 registerPaasUser.setTenant_name("tenant1");
+		 registerPaasUser.setCompany_name("Bizruntime");
+		 registerPaasUser.setCompany_address("Sarjapur");
+		 registerPaasUser.setEmail("Venkatesh.m@bizruntime.com");
+		 registerPaasUser.setPassword("Bizruntime@123");
+		 new PaasUserRegisterAndLoginDAO().registerPaasUser(registerPaasUser);
+	}
 	/**
 	 * This method is used to  register user to paas
 	 * @param paasUserRegister : PaasUserRegisterVO Object type contain details require to register the user
@@ -47,12 +57,14 @@ public class PaasUserRegisterAndLoginDAO {
 		Connection connection=null;
 		PreparedStatement pstmt = null;
 		try {
-			 connection = connectionFactory.getConnection(MYSQL_DB);			
+			connection = connectionFactory.getConnection(MYSQL_DB);			
 			pstmt = (PreparedStatement) connection.prepareStatement(REGISTER_USER_QUERY);
-			pstmt.setString(1, paasUserRegister.getCompany_name());
-			pstmt.setString(2, paasUserRegister.getCompany_address());
-			pstmt.setString(3, paasUserRegister.getEmail());
-			pstmt.setString(4, paasUserRegister.getPassword());
+			
+			pstmt.setString(1, paasUserRegister.getTenant_name());
+			pstmt.setString(2, paasUserRegister.getEmail());
+			pstmt.setString(3, paasUserRegister.getCompany_name());
+			pstmt.setString(4, paasUserRegister.getCompany_address());
+			 
 			pstmt.executeUpdate();
 			logger.debug("Data Inserted");
 		} catch (ClassNotFoundException | IOException e) {
@@ -91,16 +103,17 @@ public class PaasUserRegisterAndLoginDAO {
 			 result=stmt.executeQuery(ALL_REGISTERED_USER_QUERY);
 			 if(result!=null){
 				 while(result.next()){
-					 String company_name=result.getString("company_name");
-					 String company_address=result.getString("company_address");
-					 String email=result.getString("email");
-					 String password=result.getString("password");
-					 int id=result.getInt("id");
-					 PaasUserRegister paasUser=new PaasUserRegister(company_name, company_address, email, password,id);
+					 String tenant_name = result.getString("tenant_name");
+					 String company_name = result.getString("company_name");
+					 String company_address = result.getString("company_address");
+					 String email = result.getString("tenant_email");
+					 String password = result.getString("password");
+					 int id = result.getInt("id");
+					 PaasUserRegister paasUser=new PaasUserRegister(company_name, company_address, email, password,id,tenant_name);
 					 paasUserList.add(paasUser);
 				 }
 			 }else{
-				 logger.debug("No data available in register table");
+				 logger.debug("No data available in tenant table");
 			 }
 			 logger.debug("Paas user List : "+paasUserList);				 
 		} catch (ClassNotFoundException | IOException e) {
@@ -179,13 +192,13 @@ public class PaasUserRegisterAndLoginDAO {
 			 pstmt.setString(2,password);			 
 			  result=pstmt.executeQuery();	
 			 if(result.next()){
-				 
+				 String tenant_name = result.getString("tenant_name");
 				 String company_name=result.getString("company_name");
 				 String company_address=result.getString("company_address");
-				  email=result.getString("email");
-				  password=result.getString("password");
+				 email=result.getString("tenant_email");
+				 password=result.getString("password");
 				 int id=result.getInt("id");
-				  paasUser=new PaasUserRegister(company_name, company_address, email, password,id);
+				 paasUser=new PaasUserRegister(company_name, company_address, email, password,id,tenant_name);
 				 logger.debug("Logged in   with email : "+email+"and password+"+password+" is  successfull");	
 			 }
 		} catch (ClassNotFoundException | IOException e) {
@@ -207,7 +220,7 @@ public class PaasUserRegisterAndLoginDAO {
 	}//end of method loginToPaas
 	
 	/**
-	 * This method is used to check if email already exist in register table or not
+	 * This method is used to check if email already exist in tenant table or not
 	 * @param email : String , check if email already exist
 	 * @return boolean : true if exist and false if not
 	 * @throws DataBaseOperationFailedException 
@@ -229,11 +242,11 @@ public class PaasUserRegisterAndLoginDAO {
 				 logger.debug("Email already exist with value : "+email);	
 			 }
 		} catch (ClassNotFoundException | IOException e) {
-			logger.error("Unable to fetch email from regsiter table with value : "+email);
+			logger.error("Unable to fetch email from tenant table with value : "+email);
 			throw new DataBaseOperationFailedException("Unable to fetch email from regsiter table with value : "+email,e);
 		} catch(SQLException e) {
 			if(e.getErrorCode() == 1064) {
-				String message = "Unable to fetch email from regsiter table " + PAASErrorCodeExceptionHelper.exceptionFormat(PAASConstant.ERROR_IN_SQL_SYNTAX);
+				String message = "Unable to fetch email from tenant table " + PAASErrorCodeExceptionHelper.exceptionFormat(PAASConstant.ERROR_IN_SQL_SYNTAX);
 				throw new DataBaseOperationFailedException(message, e);
 			} else if(e.getErrorCode() == 1146) {
 				String message = "Unable to fetch email from regsiter table because: " + PAASErrorCodeExceptionHelper.exceptionFormat(PAASConstant.TABLE_NOT_EXIST);
@@ -247,7 +260,7 @@ public class PaasUserRegisterAndLoginDAO {
 	}//end of method checkEmailExist
 	
 	/**
-	 * This method is used to check if email and password already exist in register table or not
+	 * This method is used to check if email and password already exist in tenant table or not
 	 * @param email : String , check if email already exist
 	 * @param password : String, check if password exist
 	 * @return boolean : true if exist and false if not
@@ -264,6 +277,7 @@ public class PaasUserRegisterAndLoginDAO {
 		PaasUserRegister paasUser=null;
 		try {
 			connection = connectionFactory.getConnection(MYSQL_DB);
+			
 			pstmt = (PreparedStatement) connection.prepareStatement(CHECKEMAIl_AND_PASSWORD_EXIST_QUERY);
 			pstmt.setString(1, email);
 			pstmt.setString(2, password);
@@ -271,7 +285,7 @@ public class PaasUserRegisterAndLoginDAO {
 			if (result.next()) {
 				String company_name = result.getString("company_name");
 				String company_address = result.getString("company_address");
-				email = result.getString("email");
+				email = result.getString("tenant_email");
 				password = result.getString("password");
 				int id = result.getInt("id");
 				paasUser = new PaasUserRegister();
@@ -300,4 +314,5 @@ public class PaasUserRegisterAndLoginDAO {
 		return paasUser;
 	}//end of method userWithEmailPasswordExist
 
+	
 }

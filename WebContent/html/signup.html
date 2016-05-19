@@ -41,7 +41,16 @@
 									placeholder="Company Name" ng-model="fields.company_name">
 							</div>
 						</div> -->
-
+						 
+						<div class="form-group">
+							<label for="company name" class="col-md-4 control-label">Tenant Name</label>
+							<div class="col-md-7">
+								<input type="text" class="form-control" id="tenant_name"
+									name="tenant_name" placeholder="Tenant Name"
+									ng-model="fields.tenant_name" required /> <span
+									ng-show="myForm.tenant_name.$error.required">required</span>
+							</div>
+						</div>
 
 						<div class="form-group">
 							<label for="company name" class="col-md-4 control-label">Company
@@ -125,11 +134,7 @@
 									character (a number or a symbol.)</span>
 							</div>
 						</div>
-
-
-
-
-
+ 
 						<!-- <div class="form-group">
 								<label for="email" class="col-md-4 control-label">Re-enter Password</label>
 								<div class="col-md-7">
