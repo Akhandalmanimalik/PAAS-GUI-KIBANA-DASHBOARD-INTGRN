@@ -5,19 +5,11 @@ public class ImageRegistry {
 	private String name;
 	private String location;
 	private String version;
-	private String private_cloud;
 	private String user_name;
 	private String password;
-
+	private int tenant_id;
 	
-	public ImageRegistry(String name, String location, String version,String private_cloud, String user_name, String password) {
-		this.name = name;
-		this.location = location;
-		this.version = version;
-		this.private_cloud = private_cloud;
-		this.user_name = user_name;
-		this.password = password;
-	}
+	 
 
 	public String getName() {
 		return name;
@@ -43,14 +35,6 @@ public class ImageRegistry {
 		this.version = version;
 	}
 
-	public String getPrivate_cloud() {
-		return private_cloud;
-	}
-
-	public void setPrivate_cloud(String private_cloud) {
-		this.private_cloud = private_cloud;
-	}
-
 	public String getUser_name() {
 		return user_name;
 	}
@@ -66,14 +50,36 @@ public class ImageRegistry {
 	public void setPassword(String password) {
 		this.password = password;
 	}
+ 
+	public int getTenant_id() {
+		return tenant_id;
+	}
+
+	public void setTenant_id(int tenant_id) {
+		this.tenant_id = tenant_id;
+	}
+
+	public ImageRegistry(String name, String location, String version,
+			String user_name, String password, int tenant_id) {
+		super();
+		this.name = name;
+		this.location = location;
+		this.version = version;
+		this.user_name = user_name;
+		this.password = password;
+		this.tenant_id = tenant_id;
+	}
 
 	@Override
 	public String toString() {
-		return "ImageRegistryVO [name=" + name + ", location=" + location
-				+ ", version=" + version + ", private_cloud=" + private_cloud
-				+ ", user_name=" + user_name + ", password=" + password + "]";
+		return "ImageRegistry [name=" + name + ", location=" + location
+				+ ", version=" + version + ", user_name=" + user_name
+				+ ", password=" + password + ", tenant_id=" + tenant_id + "]";
 	}
-	
-	
+
+	public ImageRegistry() {
+		super();
+	}
+  
 
 }

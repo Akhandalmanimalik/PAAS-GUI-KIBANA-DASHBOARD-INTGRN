@@ -26,7 +26,7 @@ import static com.getusroi.paas.helper.PAASConstant.*;
  */
 public class ImageRegistryDAO {
 	 static final Logger logger = LoggerFactory.getLogger(ImageRegistryDAO.class);
-	 private final String INSERT_IMAGEREGISTRY_QUERY="insert into image_registry VALUES(?,?,?,?,?,?)";
+	 private final String INSERT_IMAGEREGISTRY_QUERY="insert into image_registry (registory_name,registory_url,version,user_name,password,tenant_id,createDTM) VALUES (?,?,?,?,?,?,NOW())";
 	 private final String GET_ALL_IMAGEREGISTRY_QUERY="select * from image_registry";
 	 private final String GET_IMAGE_REGISTRY_BY_NAME="select * from image_registry where name=?";
 	 private final String DELETE_IMAGEREGISTRY_BY_IMAGENAME_AND_USERNAME_QUERY="delete from image_registry where name=? AND user_name=?";
@@ -37,23 +37,25 @@ public class ImageRegistryDAO {
 	  */
 	public void addImageRegistry(ImageRegistry imageRegistryVO) throws DataBaseOperationFailedException{
 		logger.debug(".addImageRegistry method of ImageRegistryDAO");
+		logger.debug("name "+imageRegistryVO.getName()+" url "+imageRegistryVO.getLocation()+" Version "+imageRegistryVO.getVersion()+" user name "+imageRegistryVO.getUser_name()+" password "+imageRegistryVO.getPassword()+" tenant id "+imageRegistryVO.getTenant_id());
 		DataBaseConnectionFactory connectionFactory=new DataBaseConnectionFactory();
 		Connection connection=null;
 		PreparedStatement pstmt=null;
 		 try {
 			connection=connectionFactory.getConnection(MYSQL_DB);
-			pstmt = (PreparedStatement) connection
-					.prepareStatement(INSERT_IMAGEREGISTRY_QUERY);
+			pstmt = (PreparedStatement) connection.prepareStatement(INSERT_IMAGEREGISTRY_QUERY);
 			pstmt.setString(1, imageRegistryVO.getName());
 			pstmt.setString(2, imageRegistryVO.getLocation());
 			pstmt.setString(3, imageRegistryVO.getVersion());
-			pstmt.setString(4, imageRegistryVO.getPrivate_cloud());
-			pstmt.setString(5, imageRegistryVO.getUser_name());
-			pstmt.setString(6, imageRegistryVO.getPassword());
+			pstmt.setString(4, imageRegistryVO.getUser_name());
+			pstmt.setString(5, imageRegistryVO.getPassword());
+			pstmt.setInt(6, imageRegistryVO.getTenant_id());
+			
 			pstmt.executeUpdate();
+			
 			logger.debug("image registry data inserted successfully : "+imageRegistryVO);
 		} catch (ClassNotFoundException | IOException e) {
-			logger.error("Unable to store the image registry in db : "+imageRegistryVO.toString());
+			logger.error("Unable to store the image registry in db : "+imageRegistryVO.toString(),e);
 			throw new DataBaseOperationFailedException("Unable to store the image registry in db : "+imageRegistryVO.toString(),e);
 		}catch(SQLException e) {
 			if(e.getErrorCode() == 1064) {
@@ -94,8 +96,9 @@ public class ImageRegistryDAO {
 					String private_cloud=result.getString("private_cloud");
 					String user_name=result.getString("user_name");
 					String password=result.getString("password");
+					int tenant_id = result.getInt("tenant_id");
 					logger.debug("name : "+name+", location : "+location+", version : "+version+", private cloud : "+private_cloud+", user name : "+user_name+", password : "+password);
-					ImageRegistry imageRegistry=new ImageRegistry(name, location, version, private_cloud, user_name, password);
+					ImageRegistry imageRegistry=new ImageRegistry(name, location, version, user_name, password,tenant_id);
 					imageRegistryList.add(imageRegistry);
 				}//end of while
 				logger.debug("element in image registry list are : "+imageRegistryList);
@@ -142,14 +145,16 @@ public class ImageRegistryDAO {
 			result=pstmt.executeQuery();
 			if(result !=null){
 				while(result.next()){
-					String name=result.getString("name");
-					String location=result.getString("location");
-					String version=result.getString("version");
-					String private_cloud=result.getString("private_cloud");
-					String user_name=result.getString("user_name");
-					String password=result.getString("password");
+					String name = result.getString("name");
+					String location = result.getString("location");
+					String version = result.getString("version");
+					String private_cloud = result.getString("private_cloud");
+					String user_name = result.getString("user_name");
+					String password = result.getString("password");
+					int tenant_id = result.getInt("tenant_id");
+					
 					logger.debug("name : "+name+", location : "+location+", version : "+version+", private cloud : "+private_cloud+", user name : "+user_name+", password : "+password);
-					 imageRegistry=new ImageRegistry(name, location, version, private_cloud, user_name, password);
+					 imageRegistry=new ImageRegistry(name, location, version, user_name, password,tenant_id);
 					
 				}//end of while
 				logger.debug("element in image registry list are : "+imageRegistry);
