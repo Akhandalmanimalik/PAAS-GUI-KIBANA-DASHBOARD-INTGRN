@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import com.getusroi.paas.dao.DataBaseOperationFailedException;
 import com.getusroi.paas.dao.PaasUserRegisterAndLoginDAO;
 import com.getusroi.paas.rest.service.exception.UserRegisterAndLoginServiceException;
+import com.getusroi.paas.security.MD5PasswordEncryption;
 import com.getusroi.paas.vo.PaasUserRegister;
 
 
@@ -73,9 +74,10 @@ public class RegistrationAndLoginService {
 				JSONObject jsonObject = new JSONObject(loginData);
 
 				PaasUserRegisterAndLoginDAO checkUniqueUser = new PaasUserRegisterAndLoginDAO();
+				String mD5ncryptedPassword = new MD5PasswordEncryption().getMD5EncryptedPassword(jsonObject.getString("password"));
 				paasUserRegister = checkUniqueUser.userWithEmailPasswordExist(
 						jsonObject.getString("email"),
-						jsonObject.getString("password"));
+						mD5ncryptedPassword);
 
 				if (paasUserRegister != null) {
 					HttpSession session = req.getSession(true);

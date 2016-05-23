@@ -71,8 +71,8 @@ public class ApplicationService {
 	public String getApplicationSummary(String repositoryName) throws DataBaseOperationFailedException, ApplicationServiceException{
 		logger.debug(".getApplicationSummary method of ApplicationService ");
 		JSONObject jsonObject =new JSONObject(repositoryName);
-		ImageRegistryDAO imageRegistryDAO=new ImageRegistryDAO();
-		ImageRegistry imageRegistry=imageRegistryDAO.getImageRegistryByName(jsonObject.getString("imageRegistry"));
+		ImageRegistryDAO imageRegistryDAO = new ImageRegistryDAO();
+		ImageRegistry imageRegistry = imageRegistryDAO.getImageRegistryByName(jsonObject.getString("imageRegistry"));
 		String response=null;
 		if(imageRegistry != null){
 			String baseURL = PAASConstant.HTTPS_PROTOCOL_KEY+imageRegistry.getLocation() +PAASConstant.ALL_REPOSTORY_KEY+imageRegistry.getName()+PAASConstant.ALL_TAGS_KEY;

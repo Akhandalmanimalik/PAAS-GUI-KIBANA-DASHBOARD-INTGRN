@@ -1,5 +1,7 @@
 package com.getusroi.paas.dao;
 
+import static com.getusroi.paas.helper.PAASConstant.MYSQL_DB;
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -8,8 +10,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpSession;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,10 +17,9 @@ import com.getusroi.paas.db.helper.DataBaseConnectionFactory;
 import com.getusroi.paas.db.helper.DataBaseHelper;
 import com.getusroi.paas.helper.PAASConstant;
 import com.getusroi.paas.helper.PAASErrorCodeExceptionHelper;
+import com.getusroi.paas.security.MD5PasswordEncryption;
 import com.getusroi.paas.vo.PaasUserRegister;
 import com.mysql.jdbc.PreparedStatement;
-
-import static com.getusroi.paas.helper.PAASConstant.*;
 
 
 /**
@@ -29,22 +28,40 @@ import static com.getusroi.paas.helper.PAASConstant.*;
  *
  */
 public class PaasUserRegisterAndLoginDAO {
-	 static final Logger logger = LoggerFactory.getLogger(PaasUserRegisterAndLoginDAO.class);
+	
+	 static final Logger LOGGER = LoggerFactory.getLogger(PaasUserRegisterAndLoginDAO.class);
 	 private static final String REGISTER_USER_QUERY="insert into tenant(tenant_name,tenant_email,company_name,company_address,createdDTM) values(?,?,?,?,NOW())";
 	 private static final String ALL_REGISTERED_USER_QUERY="select * from tenant";
 	 private static final String DELETE_RESGISTERED_USER_BY_EMAIL_COMPANYNAME="delete from tenant where tenant_email=? AND company_name=?";
 	 private static final String LOGIN_QUERY="select * from tenant where tenant_email=? AND password=?";
 	 private static final String CHECKEMAIL_EXIST_QUERY="select tenant_email from tenant where tenant_email=?";
-	 private static final String CHECKEMAIl_AND_PASSWORD_EXIST_QUERY="select * from tenant where tenant_email=? and password=?";
+	 private static final String CHECKEMAIl_AND_PASSWORD_EXIST_QUERY="select * from login where email_id=? and password=?";
+	 private static final String INSERT_USER_DETAILS_INTO_LOGIN = "insert into login(tenant_id,admin_id,email_id,password,role_id,createdDTM) values(?,?,?,?,?,NOW())";
+	 private static final int ROLE_ID=1;
 	 
-	 public static void main(String[] args) throws DataBaseOperationFailedException {
-		 PaasUserRegister registerPaasUser = new PaasUserRegister();
-		 registerPaasUser.setTenant_name("tenant1");
-		 registerPaasUser.setCompany_name("Bizruntime");
-		 registerPaasUser.setCompany_address("Sarjapur");
-		 registerPaasUser.setEmail("Venkatesh.m@bizruntime.com");
-		 registerPaasUser.setPassword("Bizruntime@123");
-		 new PaasUserRegisterAndLoginDAO().registerPaasUser(registerPaasUser);
+	public String matchPassward(PaasUserRegister paasUserRegister)
+			throws DataBaseOperationFailedException {
+		LOGGER.debug(".registerPaasUser method of PaasUserRegisterDAO");
+		final String PASSWORD_EXIST_QUERY = "select password from login where password='"
+				+ paasUserRegister.getPassword() + "'";
+		DataBaseConnectionFactory connectionFactory = new DataBaseConnectionFactory();
+		Connection connection = null;
+		Statement stmt = null;
+		String dbPassword = null;
+		try {
+			connection = connectionFactory.getConnection(MYSQL_DB);
+			stmt = connection.createStatement();
+
+			ResultSet rs = stmt.executeQuery(PASSWORD_EXIST_QUERY);
+
+			System.out.println("rs " + rs);
+			while (rs.next()) {
+				dbPassword = rs.getString("password");
+			}
+		} catch (Exception e) {
+
+		}
+		return dbPassword;
 	}
 	/**
 	 * This method is used to  register user to paas
@@ -52,13 +69,15 @@ public class PaasUserRegisterAndLoginDAO {
 	 * @throws DataBaseOperationFailedException 
 	 */
 	public void registerPaasUser(PaasUserRegister paasUserRegister) throws DataBaseOperationFailedException{
-		logger.debug(".registerPaasUser method of PaasUserRegisterDAO");
+		LOGGER.debug(".registerPaasUser method of PaasUserRegisterDAO");
 		DataBaseConnectionFactory connectionFactory = new DataBaseConnectionFactory();
 		Connection connection=null;
 		PreparedStatement pstmt = null;
+		
+		int last_inserted_id = 0;
 		try {
 			connection = connectionFactory.getConnection(MYSQL_DB);			
-			pstmt = (PreparedStatement) connection.prepareStatement(REGISTER_USER_QUERY);
+			pstmt = (PreparedStatement) connection.prepareStatement(REGISTER_USER_QUERY,Statement.RETURN_GENERATED_KEYS);
 			
 			pstmt.setString(1, paasUserRegister.getTenant_name());
 			pstmt.setString(2, paasUserRegister.getEmail());
@@ -66,9 +85,31 @@ public class PaasUserRegisterAndLoginDAO {
 			pstmt.setString(4, paasUserRegister.getCompany_address());
 			 
 			pstmt.executeUpdate();
-			logger.debug("Data Inserted");
+			
+			//NEED	 TO USE TRANSACTION FOR CONSISTENCY INSERTION IN BOTH TABLE (tenant,login)
+			
+			ResultSet rs = pstmt.getGeneratedKeys();
+            if(rs.next()) {
+                 last_inserted_id = rs.getInt(1);
+                 LOGGER.debug("last_inserted_id "+last_inserted_id);
+            }
+           
+            pstmt.close();
+            pstmt =null;
+            MD5PasswordEncryption md5Encrypt=new MD5PasswordEncryption();
+    		
+			pstmt = (PreparedStatement) connection.prepareStatement(INSERT_USER_DETAILS_INTO_LOGIN);
+			pstmt.setInt(1, last_inserted_id);
+			pstmt.setInt(2, last_inserted_id);
+			pstmt.setString(3, paasUserRegister.getEmail());
+			String password = md5Encrypt.getMD5EncryptedPassword(paasUserRegister.getPassword());
+			pstmt.setString(4, password);
+			pstmt.setInt(5	, ROLE_ID);
+			
+			pstmt.executeUpdate();
+			LOGGER.debug("Data Inserted into tenant and login successfully");
 		} catch (ClassNotFoundException | IOException e) {
-			logger.error("Unable to register user to paas");
+			LOGGER.error("Unable to register user to paas");
 			throw new DataBaseOperationFailedException("Unable to register user to paas with detail : "+paasUserRegister.toString(),e);
 		} catch(SQLException e) {
 			if(e.getErrorCode() == 1064) {
@@ -91,7 +132,7 @@ public class PaasUserRegisterAndLoginDAO {
 	 * @throws DataBaseOperationFailedException 
 	 */
 	public List<PaasUserRegister> getAllPaasUser() throws DataBaseOperationFailedException{
-		logger.debug(".getAllPaasUser method of PaasUserRegisterDAO");
+		LOGGER.debug(".getAllPaasUser method of PaasUserRegisterDAO");
 		DataBaseConnectionFactory connectionFactory = new DataBaseConnectionFactory();
 		List<PaasUserRegister> paasUserList=new ArrayList<>();
 		Connection connection=null;
@@ -113,11 +154,11 @@ public class PaasUserRegisterAndLoginDAO {
 					 paasUserList.add(paasUser);
 				 }
 			 }else{
-				 logger.debug("No data available in tenant table");
+				 LOGGER.debug("No data available in tenant table");
 			 }
-			 logger.debug("Paas user List : "+paasUserList);				 
+			 LOGGER.debug("Paas user List : "+paasUserList);				 
 		} catch (ClassNotFoundException | IOException e) {
-			logger.error("Unable to get All users registered to paas ");
+			LOGGER.error("Unable to get All users registered to paas ");
 			throw new DataBaseOperationFailedException("Unable to get All users registered to paas",e);
 		} catch(SQLException e) {
 			if(e.getErrorCode() == 1064) {
@@ -141,7 +182,7 @@ public class PaasUserRegisterAndLoginDAO {
 	 * @throws DataBaseOperationFailedException 
 	 */
 	public void deleteRegisteredUser(PaasUserRegister paasUserRegister) throws DataBaseOperationFailedException{
-		logger.debug(".deleteRegisteredUser method of PaasUserRegisterDAO");
+		LOGGER.debug(".deleteRegisteredUser method of PaasUserRegisterDAO");
 		DataBaseConnectionFactory connectionFactory = new DataBaseConnectionFactory();
 		Connection connection=null;
 		PreparedStatement pstmt = null;
@@ -151,9 +192,9 @@ public class PaasUserRegisterAndLoginDAO {
 			 pstmt.setString(1,paasUserRegister.getEmail());
 			 pstmt.setString(2,paasUserRegister.getCompany_name());
 			 pstmt.executeUpdate();			 
-			 logger.debug("registered user with email : "+paasUserRegister.getEmail()+"and companyName+"+paasUserRegister.getCompany_name()+" deleted successfully");				 
+			 LOGGER.debug("registered user with email : "+paasUserRegister.getEmail()+"and companyName+"+paasUserRegister.getCompany_name()+" deleted successfully");				 
 		} catch (ClassNotFoundException | IOException e) {
-			logger.error("Unable to delete regsitered user with email : "+paasUserRegister.getEmail()+"and companyName+"+paasUserRegister.getCompany_name());
+			LOGGER.error("Unable to delete regsitered user with email : "+paasUserRegister.getEmail()+"and companyName+"+paasUserRegister.getCompany_name());
 			throw new DataBaseOperationFailedException("Unable to delete regsitered user with email : "+paasUserRegister.getEmail()+"and companyName+"+paasUserRegister.getCompany_name(),e);
 		} catch(SQLException e) {
 			if(e.getErrorCode() == 1064) {
@@ -178,7 +219,7 @@ public class PaasUserRegisterAndLoginDAO {
 	 * @throws DataBaseOperationFailedException
 	 */
 	public PaasUserRegister loginToPaas(String email,String password) throws DataBaseOperationFailedException{
-		logger.debug(".loginToPaas method of PaasUserRegisterDAO");
+		LOGGER.debug(".loginToPaas method of PaasUserRegisterDAO");
 		DataBaseConnectionFactory connectionFactory = new DataBaseConnectionFactory();
 		Connection connection=null;
 		PreparedStatement pstmt = null;
@@ -199,10 +240,10 @@ public class PaasUserRegisterAndLoginDAO {
 				 password=result.getString("password");
 				 int id=result.getInt("id");
 				 paasUser=new PaasUserRegister(company_name, company_address, email, password,id,tenant_name);
-				 logger.debug("Logged in   with email : "+email+"and password+"+password+" is  successfull");	
+				 LOGGER.debug("Logged in   with email : "+email+"and password+"+password+" is  successfull");	
 			 }
 		} catch (ClassNotFoundException | IOException e) {
-			logger.error("Unable to loggedIn  with email : "+email+"and password+"+password);
+			LOGGER.error("Unable to loggedIn  with email : "+email+"and password+"+password);
 			throw new DataBaseOperationFailedException("Unable to loggedIn  with email : "+email+"and password+"+password,e);
 		} catch(SQLException e) {
 			if(e.getErrorCode() == 1064) {
@@ -226,7 +267,7 @@ public class PaasUserRegisterAndLoginDAO {
 	 * @throws DataBaseOperationFailedException 
 	 */
 	public boolean checkEmailExist(String email) throws DataBaseOperationFailedException{
-		logger.debug(".checkEmailExist method of PaasUserRegisterDAO");
+		LOGGER.debug(".checkEmailExist method of PaasUserRegisterDAO");
 		DataBaseConnectionFactory connectionFactory = new DataBaseConnectionFactory();
 		Connection connection=null;
 		PreparedStatement pstmt = null;
@@ -239,10 +280,10 @@ public class PaasUserRegisterAndLoginDAO {
 			  result=pstmt.executeQuery();	
 			 if(result.next()){
 				 emailFlag=true;
-				 logger.debug("Email already exist with value : "+email);	
+				 LOGGER.debug("Email already exist with value : "+email);	
 			 }
 		} catch (ClassNotFoundException | IOException e) {
-			logger.error("Unable to fetch email from tenant table with value : "+email);
+			LOGGER.error("Unable to fetch email from tenant table with value : "+email);
 			throw new DataBaseOperationFailedException("Unable to fetch email from regsiter table with value : "+email,e);
 		} catch(SQLException e) {
 			if(e.getErrorCode() == 1064) {
@@ -268,7 +309,7 @@ public class PaasUserRegisterAndLoginDAO {
 	 */
 	public PaasUserRegister userWithEmailPasswordExist(String email,String password) throws DataBaseOperationFailedException{
 		
-		logger.debug(".userWithEmailPasswordExist method of PaasUserRegisterDAO");
+		LOGGER.debug(".userWithEmailPasswordExist method of PaasUserRegisterDAO");
 		DataBaseConnectionFactory connectionFactory = new DataBaseConnectionFactory();
 		Connection connection=null;
 		PreparedStatement pstmt = null;
@@ -283,21 +324,17 @@ public class PaasUserRegisterAndLoginDAO {
 			pstmt.setString(2, password);
 			result = pstmt.executeQuery();
 			if (result.next()) {
-				String company_name = result.getString("company_name");
-				String company_address = result.getString("company_address");
-				email = result.getString("tenant_email");
+				
+				email = result.getString("email_id");
 				password = result.getString("password");
-				int id = result.getInt("id");
+				int id = result.getInt("tenant_id");
 				paasUser = new PaasUserRegister();
-				paasUser.setCompany_address(company_address);
-				paasUser.setCompany_name(company_name);
 				paasUser.setEmail(email);
 				paasUser.setId(id);
-				logger.debug("Email and password already exist with value : "
-						+ email + " and " + password);
+				LOGGER.debug("Email and password already exist with value : "+ email + " and " + password);
 			}
 		} catch (ClassNotFoundException | IOException e) {
-			logger.error("Unable to fetch data from regsiter table with value : "+email);
+			LOGGER.error("Unable to fetch data from regsiter table with value : "+email);
 			throw new DataBaseOperationFailedException("Unable to fetch data from regsiter table with value : "+email+" and pass : "+password,e);
 		} catch(SQLException e) {
 			if(e.getErrorCode() == 1064) {
