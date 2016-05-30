@@ -42,39 +42,27 @@
 			
 			<modal title="Add Application" visible="showModal">
 
-			<form role="form" onsubmit="return closeSelf()">
+			<form role = "form" onsubmit="return closeSelf()">
 				<div class="form-group">
 					<label for="VPC_Name">Name</label> <input type="text"
 						class="form-control" id="VPC_Name" placeholder="Name"
 						ng-model="field.applicantionName" name="applicantName" />
 				</div>
-
-
 				<div class="form-group">
 					<label for="VPC_Name">Description</label> <input type="text"
 						class="form-control" id="VPC_Name" placeholder="Description"
 						ng-model="field.description" name="Description" />
 				</div>
-
-
-
-
-
-
-
 				<div class="modal-footer" style="background: #ccefff">
 					<div class="bootstrap-dialog-footer">
-				<button type="button" class="btn btn-danger btn-nirmata col-xs-2"
+						<button type="button" class="btn btn-danger btn-nirmata col-xs-2"
 							data-dismiss="modal">Cancel</button>
 						<button class="btn btn-primary btn-nirmata" data-dismiss="modal"
 							ng-click="storeApplicantUser();">Add</button>
-
 					</div>
 				</div>
 		</div>
-		
-
-
+ 
 		</modal>
 
 
@@ -83,7 +71,6 @@
 			<div class="w3-card">
 				<a href="applicationsummary.html"><span
 					style="font-size: 18px; color: blue;">{{field.applicantionName}}</span></a>
-
 
 				<p></p>
 			</div>

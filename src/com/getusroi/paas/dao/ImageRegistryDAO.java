@@ -90,14 +90,14 @@ public class ImageRegistryDAO {
 			result=stmt.executeQuery(GET_ALL_IMAGEREGISTRY_QUERY);
 			if(result !=null){
 				while(result.next()){
-					String name=result.getString("name");
-					String location=result.getString("location");
+					String name=result.getString("registory_name");
+					String location=result.getString("registory_url");
 					String version=result.getString("version");
-					String private_cloud=result.getString("private_cloud");
+					//String private_cloud=result.getString("private_cloud");
 					String user_name=result.getString("user_name");
 					String password=result.getString("password");
 					int tenant_id = result.getInt("tenant_id");
-					logger.debug("name : "+name+", location : "+location+", version : "+version+", private cloud : "+private_cloud+", user name : "+user_name+", password : "+password);
+					logger.debug("name : "+name+", location : "+location+", version : "+version+", user name : "+user_name+", password : "+password);
 					ImageRegistry imageRegistry=new ImageRegistry(name, location, version, user_name, password,tenant_id);
 					imageRegistryList.add(imageRegistry);
 				}//end of while

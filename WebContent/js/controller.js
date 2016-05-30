@@ -6,6 +6,7 @@ app.controller("MyController", function($scope, $http) {
 	$scope.user="Test USer ";
                      /*registration controller*/
 	$scope.reg = function() {
+		
 		console.log($scope.fields);
 		var userData = JSON.stringify($scope.fields);
 
@@ -39,15 +40,16 @@ app.controller("MyController", function($scope, $http) {
 				}
 			}
 		})*/
-	             /*login*/
+	    /*login*/
 	$scope.login = function() {
-	
+		console.log("comming to login function of Angular js");
+		alert("comming to login function of Angular js");
 		var userData = JSON.stringify($scope.fields);
 		var res = $http.post('/PAAS-GUI/rest/registerAndLoginService/login',userData);
 		res.success(function(data, status, headers, config) {
-			console.log("login sucessfull with  USer EMail:");
+		console.log("login sucessfull with  USer EMail:");
 
-			try{
+		try{
 			$scope.user=data;
 
 			console.log("Login sucess"+	$scope.user);

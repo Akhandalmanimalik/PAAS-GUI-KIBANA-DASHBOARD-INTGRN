@@ -23,12 +23,14 @@ import com.getusroi.paas.dao.DataBaseOperationFailedException;
 import com.getusroi.paas.dao.PaasUserRegisterAndLoginDAO;
 import com.getusroi.paas.rest.service.exception.UserRegisterAndLoginServiceException;
 import com.getusroi.paas.security.MD5PasswordEncryption;
+import com.getusroi.paas.vo.KibanaDashboard;
 import com.getusroi.paas.vo.PaasUserRegister;
 
 
 @Path("/registerAndLoginService")
 public class RegistrationAndLoginService {
-	 static final Logger logger = LoggerFactory.getLogger(RegistrationAndLoginService.class);
+	static final Logger logger = LoggerFactory.getLogger(RegistrationAndLoginService.class);
+	HttpServletRequest req =null; 
 
 	@POST
 	@Path("register")
@@ -63,9 +65,9 @@ public class RegistrationAndLoginService {
 	@Path("login")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.TEXT_PLAIN)
-	public String checkForUniqueUser(String loginData,@Context HttpServletRequest req) throws DataBaseOperationFailedException, UserRegisterAndLoginServiceException {
+	public String checkForUniqueUser(String loginData, @Context HttpServletRequest req) throws DataBaseOperationFailedException, UserRegisterAndLoginServiceException {
 		logger.debug(".checkForUniqueUser method of RegistrationAndLoginService");
-		
+		this.req=req;
 		PaasUserRegister paasUserRegister=null;
 		try {
 			if (loginData != null && !(loginData.isEmpty())
@@ -78,15 +80,17 @@ public class RegistrationAndLoginService {
 				paasUserRegister = checkUniqueUser.userWithEmailPasswordExist(
 						jsonObject.getString("email"),
 						mD5ncryptedPassword);
-
+				logger.debug("after checking email and password ");
 				if (paasUserRegister != null) {
 					HttpSession session = req.getSession(true);
 					session.setAttribute("id", paasUserRegister.getId());
-
+					session.setAttribute("email", paasUserRegister.getEmail());
+					session.setAttribute("password", mD5ncryptedPassword);
 					logger.debug("Login sucess full with Email ID: "
 							+ paasUserRegister.getEmail());
 					return paasUserRegister.getEmail();
 				} else {
+					logger.debug("return failed bcz "+paasUserRegister);
 					return "failed";
 				}
 
@@ -98,6 +102,7 @@ public class RegistrationAndLoginService {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+		logger.debug("returning sucess");
 		return "Sucess";
 	}//end of method checkForUniqueUser
 	
@@ -114,6 +119,7 @@ public class RegistrationAndLoginService {
 		return username;
 		}
 	}//end of method checkEmailExist
+	
 	@GET
 	@Path("logout")
 	@Produces(MediaType.TEXT_PLAIN)
@@ -122,9 +128,26 @@ public class RegistrationAndLoginService {
 		
 		HttpSession session=request.getSession(false);
 		session.invalidate();
-		
-		
-		
+		 
 	}
 	
+	@GET
+    @Path("test")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String authUser(@Context HttpServletRequest req)  {
+        logger.debug("Inside authUser of Service class");
+        KibanaDashboard userDetails = new KibanaDashboard();
+ 		HttpSession session = req.getSession(true);
+
+//		userDetails.setUserName((String)session.getAttribute("email"));
+ 		userDetails.setUserName("manoj.prajapati@bizruntime.com");
+//		userDetails.setIndexOfES("google");
+//		userDetails.setPassword((String)session.getAttribute("password"));//+" index "+u
+ 		userDetails.setPassword("5f57c08b0edde89daf27cf82c746120d");
+ 		logger.debug(">>>>> user details of kibana dashboard user email "+session.getAttribute("email")+" password "+session.getAttribute("password")+" index name "/*+userDetails.getIndexOfES()*/);
+        return userDetails+"";
+    }//e
+	
 }
+
+
