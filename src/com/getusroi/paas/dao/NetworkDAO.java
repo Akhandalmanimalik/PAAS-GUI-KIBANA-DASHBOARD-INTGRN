@@ -34,7 +34,7 @@ public class NetworkDAO {
 	 private final String GET_ALL_VPC_QUERY="select * from vpc";
 	 private final String DELETE_VPC_BY_NAME_QUERY="delete from vpc where vpc_name=?";
 	 private final String UPDATE_VPC_BY_NAME_AND_VPCID_QUERY="update vpc set vpc_region=? , cidr=?, acl=? where vpcId=? AND vpc_name=?";
-	 private final String INSERT_ACL_QUERY="insert into acl values(?,?,?,?)";
+	 private final String INSERT_ACL_QUERY="insert into acl (acl_name,source_ip,destination_ip,tenant_id,subnet_id,createdDTM) values(?,?,?,?,?,NOW())";
 	 private final String GEL_ALL_ACL_NAMES_QUERY="select aclname from acl";
 	 private final String GEL_ALL_ACL_QUERY="select * from acl";
 	 private final String UPDATE_ACL_BY_NAME_QUERY="update acl set action=?, sourceip=?, destip=? where name=?";
@@ -256,11 +256,13 @@ public class NetworkDAO {
 		PreparedStatement pstmt=null;
 		try {
 			connection=connectionFactory.getConnection("mysql");
+//			"insert into acl (acl_name,source_ip,destination_ip,tenant_id,subnet_id,createdDTM) values(?,?,?,?,?,NOW())";
 			pstmt=(PreparedStatement) connection.prepareStatement(INSERT_ACL_QUERY);
-			pstmt.setString(1,acl.getAction());
+			pstmt.setString(1,acl.getAclName());
 			pstmt.setString(2,acl.getSrcIp());
 			pstmt.setString(3,acl.getDestIP());
-			pstmt.setString(4, acl.getAclName());
+			pstmt.setInt(4, acl.getTenant_id());
+			pstmt.setInt(5, acl.getSubnet_id());
 			pstmt.executeUpdate();
 			logger.debug("ACL with data : "+acl+" executed successfully");
 		} catch (ClassNotFoundException | IOException e) {
@@ -337,12 +339,15 @@ public class NetworkDAO {
 			result=stmt.executeQuery(GEL_ALL_ACL_QUERY);
 			if(result !=null){
 				while(result.next()){
-					String action=result.getString("action");
+					
 					String sourceip=result.getString("sourceip");
 					String destip=result.getString("destip");
 					String aclname=result.getString("aclname");
-					logger.debug("action : "+action+", source ip: "+sourceip+", destination ip : "+destip+", acl name : "+aclname);
-					ACL acl=new ACL(sourceip, destip, action, aclname);
+					//HARDCODE VAL
+					int tenant_id=0;
+					int subnet_id=0;
+					logger.debug("source ip: "+sourceip+", destination ip : "+destip+", acl name : "+aclname);
+					ACL acl= new ACL(sourceip, destip,aclname,tenant_id,subnet_id);
 					aclList.add(acl);
 				}
 			}else{
@@ -377,7 +382,7 @@ public class NetworkDAO {
 		try {
 			connection=connectionFactory.getConnection("mysql");
 			pstmt=(PreparedStatement) connection.prepareStatement(UPDATE_ACL_BY_NAME_QUERY);
-			pstmt.setString(1,acl.getAction());
+			
 			pstmt.setString(2, acl.getSrcIp());
 			pstmt.setString(3, acl.getDestIP());
 			pstmt.setString(5, acl.getAclName());

@@ -21,6 +21,7 @@ import com.getusroi.elastic_search.exception.ESServiceFailedException;
 import com.getusroi.elastic_search.exception.WriteToYMLFailedException;
 import com.getusroi.elastic_search.helper.ESConfigHelper;
 import com.getusroi.elastic_search.helper.ESConstant;
+import com.getusroi.paas.vo.PaasUserRegister;
 
 /**
  * ESYMLUsers class <br>
@@ -60,7 +61,7 @@ public class ESYMLUsers {
 	 * 
 	 * @throws WriteToYMLFailedException
 	 */
-	public void writeUserToYML() throws WriteToYMLFailedException {
+	public void writeUserToYML(PaasUserRegister paasUserRegister) throws WriteToYMLFailedException {
 
 		logger.debug("Write user to YML file");
 
@@ -72,9 +73,9 @@ public class ESYMLUsers {
 		}
 
 		Map<String, Object> data = new LinkedHashMap<String, Object>();
-		data.put(ESConstant.ES_NAME, "manoj.prajapati@bizruntime.com");//dynamic value of user will come in place of user3
+		data.put(ESConstant.ES_NAME, paasUserRegister.getEmail());//dynamic value of user will come in place of user3
 		data.put(ESConstant.ES_TYPE, "allow");
-		data.put(ESConstant.ES_AUTH, "manoj.prajapati@bizruntime.com:5f57c08b0edde89daf27cf82c746120d");//dynamic value will come as username and password.
+		data.put(ESConstant.ES_AUTH, paasUserRegister.getEmail()+":"+paasUserRegister.getPassword());//dynamic value will come as username and password.
 		data.put(ESConstant.ES_ACCESS, "ro");
 		data.put(ESConstant.ES_INDICES,
 				new String[] { ".kibana*", "google" });//in place of google dynamic values will come.
@@ -146,8 +147,11 @@ public class ESYMLUsers {
 
 	//To remove
 	public static void main(String[] args) {
+		PaasUserRegister paasUserRegister= new PaasUserRegister();
+		paasUserRegister.setEmail("test@gmail.com");
+		paasUserRegister.setPassword("testpwd");
 		try {
-			new ESYMLUsers().writeUserToYML();
+			new ESYMLUsers().writeUserToYML(paasUserRegister);
 		} catch (WriteToYMLFailedException e) {
 			logger.error(e.getMessage());
 		}

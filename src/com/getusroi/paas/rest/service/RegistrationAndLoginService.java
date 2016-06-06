@@ -19,6 +19,8 @@ import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.getusroi.elastic_search.exception.WriteToYMLFailedException;
+import com.getusroi.elastic_search.readonlyrest.ESYMLUsers;
 import com.getusroi.paas.dao.DataBaseOperationFailedException;
 import com.getusroi.paas.dao.PaasUserRegisterAndLoginDAO;
 import com.getusroi.paas.rest.service.exception.UserRegisterAndLoginServiceException;
@@ -35,27 +37,37 @@ public class RegistrationAndLoginService {
 	@POST
 	@Path("register")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public void registerUser(String registrationData) throws DataBaseOperationFailedException, UserRegisterAndLoginServiceException{
+	public void registerUser(String registrationData) throws DataBaseOperationFailedException, UserRegisterAndLoginServiceException, WriteToYMLFailedException{
 		logger.debug(".registerUser method of RegistrationAndLoginService");
 		PaasUserRegisterAndLoginDAO registerDAO=new PaasUserRegisterAndLoginDAO();
 		ObjectMapper mapper = new ObjectMapper();
 		PaasUserRegister paasUserRegister=null;
 		try {
-			if(registrationData !=null && !(registrationData.isEmpty()) && !(registrationData.equalsIgnoreCase(""))){
-			paasUserRegister = mapper.readValue(registrationData,PaasUserRegister.class);
-			//#TODO added new code to check user Exist with enter email
-				boolean userExist=	registerDAO.checkEmailExist(paasUserRegister.getEmail());
-				if(userExist)
-					throw new UserRegisterAndLoginServiceException("User alredy exist with enter email :  "+paasUserRegister.getEmail());
-			
-			registerDAO.registerPaasUser(paasUserRegister);
-			}else{
-				//throw exception
-				throw new UserRegisterAndLoginServiceException("registration data is not valid :  "+registrationData);
+			if (registrationData != null && !(registrationData.isEmpty())
+					&& !(registrationData.equalsIgnoreCase(""))) {
+				paasUserRegister = mapper.readValue(registrationData,
+						PaasUserRegister.class);
+				// #TODO added new code to check user Exist with enter email
+				boolean userExist = registerDAO
+						.checkEmailExist(paasUserRegister.getEmail());
+				if (userExist)
+					throw new UserRegisterAndLoginServiceException( "User alredy exist with enter email :  " + paasUserRegister.getEmail());
+
+				registerDAO.registerPaasUser(paasUserRegister);
+				// Writting user details into yml file for dashboard credential
+				new ESYMLUsers().writeUserToYML(paasUserRegister);
+
+			} else {
+				// throw exception
+				throw new UserRegisterAndLoginServiceException(
+						"registration data is not valid :  " + registrationData);
 			}
 		} catch (IOException e) {
 			logger.error("Error in reading value from : "+registrationData+" using Object mapper in registerUser ");
 			throw new UserRegisterAndLoginServiceException("Error in reading value from : "+registrationData+" using Object mapper in registerUser ");
+		}catch (WriteToYMLFailedException esException) {
+			logger.error("Error in writting userdetails into yml file from : "+registrationData+" using Object mapper in registerUser ");
+			throw new UserRegisterAndLoginServiceException("Error in reading value from : "+registrationData+" using Object mapper in registerUser ",esException);
 		}
 		
 	}//end of method registerUser
@@ -76,16 +88,19 @@ public class RegistrationAndLoginService {
 				JSONObject jsonObject = new JSONObject(loginData);
 
 				PaasUserRegisterAndLoginDAO checkUniqueUser = new PaasUserRegisterAndLoginDAO();
-				String mD5ncryptedPassword = new MD5PasswordEncryption().getMD5EncryptedPassword(jsonObject.getString("password"));
+				//String mD5ncryptedPassword = new MD5PasswordEncryption().getMD5EncryptedPassword(jsonObject.getString("password"));
+				/*paasUserRegister = checkUniqueUser.userWithEmailPasswordExist(
+						jsonObject.getString("email"),
+						mD5ncryptedPassword);*/
 				paasUserRegister = checkUniqueUser.userWithEmailPasswordExist(
 						jsonObject.getString("email"),
-						mD5ncryptedPassword);
+						jsonObject.getString("password"));
 				logger.debug("after checking email and password ");
 				if (paasUserRegister != null) {
 					HttpSession session = req.getSession(true);
 					session.setAttribute("id", paasUserRegister.getId());
 					session.setAttribute("email", paasUserRegister.getEmail());
-					session.setAttribute("password", mD5ncryptedPassword);
+					session.setAttribute("password", jsonObject.getString("password"));
 					logger.debug("Login sucess full with Email ID: "
 							+ paasUserRegister.getEmail());
 					return paasUserRegister.getEmail();
@@ -139,14 +154,23 @@ public class RegistrationAndLoginService {
         KibanaDashboard userDetails = new KibanaDashboard();
  		HttpSession session = req.getSession(true);
 
-//		userDetails.setUserName((String)session.getAttribute("email"));
- 		userDetails.setUserName("manoj.prajapati@bizruntime.com");
-//		userDetails.setIndexOfES("google");
-//		userDetails.setPassword((String)session.getAttribute("password"));//+" index "+u
- 		userDetails.setPassword("5f57c08b0edde89daf27cf82c746120d");
+ 		userDetails.setUserName((String)session.getAttribute("email"));
+		userDetails.setPassword((String)session.getAttribute("password"));//+" index "+u
+		/*userDetails.setUserName("manoj.prajapati@bizruntime.com");
+		userDetails.setPassword("5f57c08b0edde89daf27cf82c746120d");*/
+		logger.debug("userDetails "+userDetails);
  		logger.debug(">>>>> user details of kibana dashboard user email "+session.getAttribute("email")+" password "+session.getAttribute("password")+" index name "/*+userDetails.getIndexOfES()*/);
         return userDetails+"";
     }//e
+	
+	@POST
+	@Path("check")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.TEXT_PLAIN)
+	public String check(String loginData, @Context HttpServletRequest req)  {
+		logger.debug(".check  method of RegistrationAndLoginService");
+		return "Sucess";
+	}
 	
 }
 

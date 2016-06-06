@@ -96,14 +96,15 @@ public class PaasUserRegisterAndLoginDAO {
            
             pstmt.close();
             pstmt =null;
-            MD5PasswordEncryption md5Encrypt=new MD5PasswordEncryption();
+            //MD5PasswordEncryption md5Encrypt=new MD5PasswordEncryption();
     		
 			pstmt = (PreparedStatement) connection.prepareStatement(INSERT_USER_DETAILS_INTO_LOGIN);
 			pstmt.setInt(1, last_inserted_id);
 			pstmt.setInt(2, last_inserted_id);
 			pstmt.setString(3, paasUserRegister.getEmail());
-			String password = md5Encrypt.getMD5EncryptedPassword(paasUserRegister.getPassword());
-			pstmt.setString(4, password);
+			//String password = md5Encrypt.getMD5EncryptedPassword(paasUserRegister.getPassword());
+			//pstmt.setString(4, password);
+			pstmt.setString(4, paasUserRegister.getPassword());
 			pstmt.setInt(5	, ROLE_ID);
 			
 			pstmt.executeUpdate();

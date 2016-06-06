@@ -23,6 +23,7 @@ import com.getusroi.paas.dao.NetworkDAO;
 import com.getusroi.paas.helper.PAASConstant;
 import com.getusroi.paas.helper.PAASGenericHelper;
 import com.getusroi.paas.helper.ScriptService;
+import com.getusroi.paas.rest.RestServiceHelper;
 import com.getusroi.paas.rest.service.exception.PAASNetworkServiceException;
 import com.getusroi.paas.sdn.service.SDNInterface;
 import com.getusroi.paas.sdn.service.impl.SDNServiceImplException;
@@ -205,19 +206,24 @@ public class PAASNetworkService {
 	 @POST
 	 @Path("/addACLRule")
 	 @Consumes(MediaType.APPLICATION_JSON)
-	 public void addACLRule(String aclData) throws SDNServiceImplException, DataBaseOperationFailedException, PAASNetworkServiceException{
+	 public void addACLRule(String aclData,@Context HttpServletRequest req) throws SDNServiceImplException, DataBaseOperationFailedException, PAASNetworkServiceException{
 		 logger.debug(".addACLRule method of PAASNetworkService");
 		 ObjectMapper mapper = new ObjectMapper();
 		 NetworkDAO networkDAO=new NetworkDAO();
-		 SDNInterface sdnService=new SDNServiceWrapperImpl();
+		 SDNInterface sdnService = new SDNServiceWrapperImpl();
+		 RestServiceHelper restServcHelper = new RestServiceHelper();
 		 boolean flowFlag=false;
 		 try {
-			ACL acl=mapper.readValue(aclData, ACL.class);
-			if(acl.getAction().equalsIgnoreCase("pass")){
-			flowFlag=sdnService.installFlow(acl.getAclName(), acl.getSrcIp(), acl.getDestIP(),PAASConstant.ACL_PASS_ACTION_KEY);
-			}else{
-				flowFlag=sdnService.installFlow(acl.getAclName(), acl.getSrcIp(), acl.getDestIP(),PAASConstant.ACL_OTHER_ACTION_KEY);
-			}			
+			ACL acl = mapper.readValue(aclData, ACL.class);			
+				
+				logger.debug("comming to before >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+				flowFlag=sdnService.installFlow(acl.getAclName(), acl.getSrcIp(), acl.getDestIP(),PAASConstant.ACL_PASS_ACTION_KEY);
+//				flowFlag = sdnService.installFlow(acl.getAclName(), acl.getSrcIp(), acl.getDestIP(),PAASConstant.ACL_OTHER_ACTION_KEY);
+				logger.debug("comming to after>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+				HttpSession session = req.getSession(true);
+				if(session != null && acl != null)
+					acl.setTenant_id(restServcHelper.convertStringToInteger(session.getAttribute("id")+""));
+				
 			if(flowFlag){
 				networkDAO.insertACL(acl);
 			}

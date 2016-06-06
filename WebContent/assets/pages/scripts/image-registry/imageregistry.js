@@ -13,9 +13,10 @@ myimageregistry.controller('MainCtrl', function ($scope,$http) {
  /*============ ImageRegistry REG=============*/
     
     $scope.regImageRegistry = function() {
+    	console.log("Inside (.) regImageRegistry ");
     	console.log($scope.field);
     	var userData = JSON.stringify($scope.field);
-    	var res = $http.post('/PAAS-GUI/rest/imageRegistry/addImageRegistry', userData);
+    	var res = $http.post('/paas-gui/rest/imageRegistry/addImageRegistry', userData);
     	console.log(userData);
 
     	res.success(function(data, status, headers, config) {
@@ -34,7 +35,7 @@ myimageregistry.controller('MainCtrl', function ($scope,$http) {
     /*==================POPULATE DATA TO TABLE===================*/
     
  	 $scope.selectImageRegistry = function() {
-    	var response = $http.get('/PAAS-GUI/rest/imageRegistry/getAllImageRegistry');
+    	var response = $http.get('/paas-gui/rest/imageRegistry/getAllImageRegistry');
     	response.success(function(data){
     		$scope.fields = data;
     		console.log("data given");

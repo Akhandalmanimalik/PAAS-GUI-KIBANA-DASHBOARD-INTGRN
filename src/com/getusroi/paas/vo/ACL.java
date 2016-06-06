@@ -6,14 +6,26 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 public class ACL {
 	  private String srcIp;
 	  private String destIP;
-	  private String action;
 	  private String aclName;
-	  
-	public ACL(String srcIp, String destIP, String action, String aclName) {
+	  private int tenant_id;
+	  private int subnet_id;
+	public ACL(String srcIp, String destIP, String aclName, int tenant_id,
+			int subnet_id) {
+		super();
 		this.srcIp = srcIp;
 		this.destIP = destIP;
-		this.action = action;
 		this.aclName = aclName;
+		this.tenant_id = tenant_id;
+		this.subnet_id = subnet_id;
+	}
+	public ACL() {
+		super();
+	}
+	@Override
+	public String toString() {
+		return "ACL [srcIp=" + srcIp + ", destIP=" + destIP + ", aclName="
+				+ aclName + ", tenant_id=" + tenant_id + ", subnet_id="
+				+ subnet_id + "]";
 	}
 	public String getSrcIp() {
 		return srcIp;
@@ -27,24 +39,24 @@ public class ACL {
 	public void setDestIP(String destIP) {
 		this.destIP = destIP;
 	}
-	public String getAction() {
-		return action;
-	}
-	public void setAction(String action) {
-		this.action = action;
-	}
 	public String getAclName() {
 		return aclName;
 	}
 	public void setAclName(String aclName) {
 		this.aclName = aclName;
 	}
-	@Override
-	public String toString() {
-		return "ACL [srcIp=" + srcIp + ", destIP=" + destIP + ", action="
-				+ action + ", aclName=" + aclName + "]";
+	public int getTenant_id() {
+		return tenant_id;
+	}
+	public void setTenant_id(int tenant_id) {
+		this.tenant_id = tenant_id;
+	}
+	public int getSubnet_id() {
+		return subnet_id;
+	}
+	public void setSubnet_id(int subnet_id) {
+		this.subnet_id = subnet_id;
 	}
 	
-	  
 	  
 }

@@ -18,9 +18,10 @@ myfirewall.controller('MainCtrl', function($scope,$http) {
 	
 	
 	 $scope.regAcl = function() {
+		 alert("coomingg");
 	  	  console.log($scope.field);
 	  	  var userData = JSON.stringify($scope.field);
-	  	  var res = $http.post('/PAAS-GUI/rest/networkservice/addACLRule', userData);
+	  	  var res = $http.post('/paas-gui/rest/networkservice/addACLRule', userData);
 	  	  console.log(userData);
 	  	  res.success(function(data, status, headers, config) {
 	  	    $scope.message = data;
@@ -43,7 +44,7 @@ myfirewall.controller('MainCtrl', function($scope,$http) {
     
  	 $scope.selectAcl = function() {
  		 console.log("hiii");
-    	var response = $http.get('/PAAS-GUI/rest/networkservice/getAllACL');
+    	var response = $http.get('/paas-gui/rest/networkservice/getAllACL');
     	response.success(function(data){
     		$scope.fields = data;
     		console.log($scope.fields);

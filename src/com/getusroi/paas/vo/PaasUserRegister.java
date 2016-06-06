@@ -21,7 +21,7 @@ public class PaasUserRegister {
 	private String password;
 	private int id;
 	private String tenant_name;
-	private String indexOfES;
+	
 	@Override
 	public String toString() {
 		return "PaasUserRegister [company_name=" + company_name
@@ -30,7 +30,7 @@ public class PaasUserRegister {
 				+ tenant_name + "]";
 	}
 	public PaasUserRegister(String company_name, String company_address,
-			String email, String password, int id, String tenant_name,String indexOfES) {
+			String email, String password, int id, String tenant_name) {
 		super();
 		this.company_name = company_name;
 		this.company_address = company_address;
@@ -38,7 +38,7 @@ public class PaasUserRegister {
 		this.password = password;
 		this.id = id;
 		this.tenant_name = tenant_name;
-		this.indexOfES = indexOfES;
+		 
 	}
 	public String getCompany_name() {
 		return company_name;
@@ -94,11 +94,4 @@ public class PaasUserRegister {
 		System.out.println("error value " + paasUserRegister);
 
 	}
-	public String getIndexOfES() {
-		return indexOfES;
-	}
-	public void setIndexOfES(String indexOfES) {
-		this.indexOfES = indexOfES;
-	}
-	
 }

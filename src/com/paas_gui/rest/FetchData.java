@@ -697,20 +697,11 @@ System.out.println("node "+josArray );
 		}
 		LOGGER.info("-----Json is -------"+msg);
 		JSONObject  jobj=new JSONObject(msg);
-		
-	
-		
-		
-		
-             
+		   
              
      		LOGGER.info("-----VPC with  VTN Created  using  SDN -------"+msg);
 
-		
-		
-		
-		
-		
+		 
 		return null;
 	}
 	@GET

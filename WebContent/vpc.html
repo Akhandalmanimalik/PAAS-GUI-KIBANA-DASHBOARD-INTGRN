@@ -1,0 +1,241 @@
+  
+                    <div id="progress-bar">
+					<div  class="step">
+                    		<div class="circle">1</div>
+                            <div class="title">IMAGE REGISTRY</div>
+                    </div>
+ 
+ 					<div  class="stepcurrent">
+                    		<div class="circle">2</div>
+                            <div class="title">CONFIGURE VPC</div>
+                    </div>
+ 
+ 
+ 
+ 					<div  class="stepinactive">
+                    		<div class="circle">3</div>
+                            <div class="title">CONFIGURE APPLICATION</div>
+                    </div>
+ 
+ 					<div  class="stepinactive">
+                    		<div class="circle">4</div>
+                            <div class="title">DEPLOY</div>
+                    </div>
+ 
+ 		            </div>
+                    
+                    <!-- End Progress Bar -->
+					
+                                      
+                    <!-- BEGIN PAGE BASE CONTENT -->
+                    <div class="row">
+                       
+                        <div class="col-md-12">
+                        <h3>Step: Add Virtual Private Cloud (VPC)</h3>  
+                        
+                        
+                     
+                                    <!-- BEGIN FORM-->
+                                    <form action="#" id="step-1" class="form-horizontal">
+                                        <div class="form-body">
+                                            <div class="alert alert-danger display-hide">
+                                                <button class="close" data-close="alert"></button> You have some form errors. Please check below. </div>
+                                            <div class="alert alert-success display-hide">
+                                                <button class="close" data-close="alert"></button> Your form validation is successful! </div>
+                                            <div class="form-group">
+                                                <label class="control-label col-md-3">VPC Name
+                                                    <span class="required"> * </span>
+                                              </label>
+                                                <div class="col-md-4">
+                                                    <input type="text" name="name" data-required="1" class="form-control" /> 
+                                                    <span class="help-block"> Enter VPC Name</span>
+                                                    </div>
+                                                    
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="control-label col-md-3">VPC Region
+                                                    <span class="required"> * </span>
+                                              </label>
+                                                <div class="col-md-4">
+                                                    <select name="version" id="version" aria-required="true" aria-describedby="select-error" class="form-control"> 
+                                                    <option value="1.0">Region 1</option>
+                                                    <option value="2.0">Region 2</option>
+                                                    </select>
+                                                     <span class="help-block"> Select VPC Region</span>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="control-label col-md-3">CDR
+                                                    <span class="required"> * </span>
+                                                </label>
+                                                <div class="col-md-4">
+                                                      <select name="privatecloud" id="privatecloud" class="form-control"> 
+                                                    <option value="Cloud Provider 1">CDR 1</option>
+                                                    <option value="Cloud Provider 2">CDR 2/option>
+                                                    </select> 
+                                                     <span class="help-block"> Classless Inter-Domain Routing</span>
+                                                    </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="control-label col-md-3">ACL
+                                                    <span class="required"> * </span>
+                                                </label>
+                                                <div class="col-md-4">
+                                                    <input name="username" type="text" class="form-control" id="username" />
+                                                     <span class="help-block"> Select ACT (Access Control List)</span>
+                                                    </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <hr>
+                                         <h3>Step: Subnet</h3>  
+                                         <div class="form-group">
+                                                <label class="control-label col-md-3">CDR
+                                                    <span class="required"> * </span>
+                                                </label>
+                                                <div class="col-md-4">
+                                                      <select name="privatecloud" id="privatecloud" class="form-control"> 
+                                                    <option value="Cloud Provider 1">CDR 1</option>
+                                                    <option value="Cloud Provider 2">CDR 2</option>
+                                                    </select> 
+                                                     <span class="help-block"> Classless Inter-Domain Routing</span>
+                                                    </div>
+                                            </div>
+                                            <div id="spacer"></div> 
+                                        <hr>
+                                        
+                                         <h3>Step: Firewall</h3>  
+                                        
+                                   		  <div id="spacer"></div>    
+                                        
+                             <!-- TABLE PORTLET-->
+                            <div class="portlet box blue">
+                                <div class="portlet-title">
+                                    <div class="caption">
+                                       OUT BOUND RULES </div>
+                                   
+                                </div>
+                                <div class="portlet-body">
+                                    <div class="table-responsive">
+  <table class="table table-striped table-bordered table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th width="15%"> Type </th>
+                                                    <th width="15%"> Protocol </th>
+                                                    <th width="15%"> Port Range </th>
+                                                    <th width="15%"> Source  </th>
+                                                    <th width="15%"> IP </th>
+                                                    <th width="18%"> Name </th>
+                                                    <th width="7%"> Action </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td> HTTP</td>
+                                                    <td>TCP</td>
+                                                    <td> 80</td>
+                                                    <td> 45</td>
+                                                    <td>10.10.10.10</td>
+                                                    <td>Firewall 1</td>
+                                                      <td align="center"><i class="fa fa-remove"></i></td>
+                                                      
+                                                </tr>
+                                                <tr>
+                                                    <td>HTTP</td>
+                                                    <td>TCP</td>
+                                                    <td>80</td>
+                                                    <td>45</td>
+                                                    <td>10.10.10.10</td>
+                                                    <td>Firewall 1</td>
+                                                    <td align="center"><i class="fa fa-remove"></i></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>HTTP</td>
+                                                    <td>TCP</td>
+                                                    <td>80</td>
+                                                    <td>45</td>
+                                                    <td>10.10.10.10</td>
+                                                    <td>Firewall 1</td>
+                                                    <td align="center"><i class="fa fa-remove"></i></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- END  TABLE PORTLET-->           
+                            
+                              <!-- TABLE PORTLET-->
+                            <div class="portlet box blue">
+                                <div class="portlet-title">
+                                    <div class="caption">
+                                       IN BOUND RULES </div>
+                                   
+                                </div>
+                                <div class="portlet-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped table-bordered table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th width="15%"> Type </th>
+                                                    <th width="15%"> Protocol </th>
+                                                    <th width="15%"> Port Range </th>
+                                                    <th width="15%"> Source  </th>
+                                                    <th width="15%"> IP </th>
+                                                    <th width="18%"> Name </th>
+                                                    <th width="7%"> Action </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td> HTTP</td>
+                                                    <td>TCP</td>
+                                                    <td> 80</td>
+                                                    <td> 45</td>
+                                                    <td>10.10.10.10</td>
+                                                    <td>Firewall 1</td>
+                                                      <td align="center"><i class="fa fa-remove"></i></td>
+                                                      
+                                                </tr>
+                                                <tr>
+                                                    <td>HTTP</td>
+                                                    <td>TCP</td>
+                                                    <td>80</td>
+                                                    <td>45</td>
+                                                    <td>10.10.10.10</td>
+                                                    <td>Firewall 1</td>
+                                                    <td align="center"><i class="fa fa-remove"></i></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>HTTP</td>
+                                                    <td>TCP</td>
+                                                    <td>80</td>
+                                                    <td>45</td>
+                                                    <td>10.10.10.10</td>
+                                                    <td>Firewall 1</td>
+                                                    <td align="center"><i class="fa fa-remove"></i></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- END  TABLE PORTLET-->         
+                            
+                            <hr>             
+                                         <button type="button" class="btn grey-salsa btn-outline pull-left">Cancel</button>
+                                         <a ui-sref="form.payment"  class="btn green pull-right"> Continue ></a>
+                                         <button type="button" class="btn green pull-right btnspacer" > Skip >></button>
+                                         <a ui-sref="form.profile"  class="btn green pull-right"> Back ></a>
+                                         
+                                         
+                                         
+                                    	<div id="spacer"></div>
+                                    
+                                    </form>
+                                    <!-- END FORM-->
+                         			 
+                                              
+                          
+                        </div>
+                    </div>

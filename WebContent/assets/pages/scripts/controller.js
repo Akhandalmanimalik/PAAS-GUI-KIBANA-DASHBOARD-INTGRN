@@ -6,15 +6,16 @@ app.controller("MyController", function($scope, $http) {
 	$scope.user="Test USer ";
                      /*registration controller*/
 	$scope.reg = function() {
+		alert("inside reg method of controller");
 		console.log($scope.fields);
 		var userData = JSON.stringify($scope.fields);
 
-		var res = $http.post('/PAAS-GUI/rest/registerAndLoginService/register', userData);
+		var res = $http.post('/paas-gui/rest/registerAndLoginService/register', userData);
 		console.log(userData);
 
 		res.success(function(data, status, headers, config) {
 			$scope.message = data;
-			document.location.href = '/PAAS-GUI/html/login.html';
+			document.location.href = '/paas-gui/login.html';
 		});
 		res.error(function(data, status, headers, config) {
 			alert("ERROR in Registering User " + data);
@@ -39,67 +40,81 @@ app.controller("MyController", function($scope, $http) {
 				}
 			}
 		})*/
+	$scope.submitForm = function() {
+		alert("submitForm (.) ");
+        // check to make sure the form is completely valid
+        if ($scope.userForm.$valid) {
+            alert('our form is amazing');
+        }
+
+    };
 	             /*login*/
 	$scope.login = function() {
+		
+		
 		var userData = JSON.stringify($scope.fields);
-		var res = $http.post('/PAAS-GUI/rest/registerAndLoginService/login',userData);
-		alert("after AngAjaxJqeryCall");
-		res.success(function(data, status, headers, config) {
+		var email = fields.email;
+		/*var staus = validatemail(email);
+		if(status false){
 			
-			alert("Inside Success");
-			console.log("login sucessfull with  USer EMail:");
-
-			try{
-			$scope.user=data;
-
-			console.log("Login sucess"+	$scope.user);
-			}catch (e) {
-				alert("Error In getting User Name : "+e);
-				console.log("Error In getting User Name : "+e);
-	
-			}
+		}*/
+		
+		var res = $http.post('/paas-gui/rest/registerAndLoginService/login',userData);
+		res.success(function(data, status, headers, config) {
+ 
+		console.log("login sucessfull with  USer EMail:");
+		try{
+		$scope.user=data;
+		console.log("Login sucess"+	$scope.user);
+		}catch (e) {
+			 
+			console.log("Error In getting User Name : "+e);
+		}
 			 
 			if(data!='failed'){
-				alert("failed");
-			document.location.href = '/PAAS-GUI/application-listing.html';				
+				alert("login success");
+			document.location.href = '/paas-gui/application-listing.html';				
 			}else{
 				alert('Login Error Please Enter Proper Details');
-				document.location.href = '/PAAS-GUI/login.html';				
+				document.location.href = '/paas-gui/login.html';				
 
 			}
 			
+			
+			
+			
 		});
-		alert("before error");
+		
 		res.error(function(data, status, headers, config) {
-			alert("Inside success");
+			alert("Inside error");
 			alert("Error in Logining Please try agian : "+data );
 		});
-		alert("after error");
+		
 	};
 	
 	
 	$scope.logout = function() {
 	
 	console.log("Inside logout method --------");
-		var res = $http.get('/PAAS-GUI/rest/registerAndLoginService/logout');
+		var res = $http.get('/paas-gui/rest/registerAndLoginService/logout');
 		res.success(function(data, status, headers, config) {
 			
-			document.location.href = '/PAAS-GUI/html/login.html';				
+			document.location.href = '/paas-gui/login.html';				
 			
 			
 		});
 		res.error(function(data, status, headers, config) {
-			document.location.href = '/PAAS-GUI/html/login.html';				
+			document.location.href = '/paas-gui/login.html';				
 		});
 	};
 	
 	
 	
-             /*check email is exits or not*/
+        /*check email is exits or not*/
 		$scope.checkemail = function() {
 			console.log("HelloWorld");
 			var email = $scope.fields.email;
-			var res = $http.get('/PAAS-GUI/rest/registerAndLoginService/'+email);
+			var res = $http.get('/paas-gui/rest/registerAndLoginService/'+email);
 			res.success(function(data, status, headers, config) {
 				$scope.fields.email = data;
 				if(data==="Email Already Exists"){
@@ -110,7 +125,7 @@ app.controller("MyController", function($scope, $http) {
 				else{
 					console.log("correct");
 					/*logic	*/
-					var res = $http.post('/PAAS-GUI/rest/registerAndLoginService/register', userData);
+					var res = $http.post('/paas-gui/rest/registerAndLoginService/register', userData);
 					console.log(userData);
 				}
 			});

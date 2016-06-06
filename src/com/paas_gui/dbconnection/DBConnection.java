@@ -23,7 +23,7 @@ public class DBConnection {
 
 	public static Connection getConnection() throws SQLException {
 		//String url = "jdbc:mysql://192.168.1.200:3306/bizruntime";
-		String url = "jdbc:mysql://localhost:3306/bizruntime";
+		String url = "jdbc:mysql://localhost:3306/pass_overlay";
 		Connection conn = DriverManager.getConnection(url, "root", "root");
 		return conn;
 	}

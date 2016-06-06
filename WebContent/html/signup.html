@@ -4,13 +4,10 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>SignUp</title>
-<link href="http://getbootstrap.com/dist/css/bootstrap.min.css"rel="stylesheet">
-<link href="http://getbootstrap.com/examples/signin/signin.css"rel="stylesheet">
-<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
-
-<script type="text/javascript" src="../js/controller.js"></script>
-<!-- <script type="text/javascript" src="../js/validation/signUpValidation.js"></script> -->
+<link href="../assets/global/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+<link href="../assets/global/css/signin.css" rel="stylesheet" type="text/css" />
+<script src="../assets/global/scripts/angular.min.js" type="text/javascript"></script>
+<script src="../assets/pages/scripts/controller.js" type="text/javascript"></script> 
 </head>
 
 <body ng-app="MyApp" ng-controller="MyController">
@@ -22,15 +19,10 @@
 					<div class="panel-title" align="center">
 						<b>SignUp to PaaS</b>
 					</div>
-
 				</div>
-
 				<div style="padding-top: 30px" class="panel-body">
-
 					<div style="display: none" id="login-alert"
 						class="alert alert-danger col-sm-12"></div>
-
-
 					<form name="myForm" id="myForm" class="form-horizontal" role="form">
 
 
@@ -83,11 +75,7 @@
 									ng-show="myForm.company_address.$error.required && myForm.company_address.$dirty">required</span>
 							</div>
 						</div>
-
-
-
-
-						<!-- 
+ 				<!-- 
 						<div class="form-group">
 							<label for="email" class="col-md-4 control-label">Email</label>
 							<div class="col-md-7">

@@ -43,7 +43,6 @@ app.controller("MyController", function($scope, $http) {
 	$scope.login = function() {
 		var userData = JSON.stringify($scope.fields);
 		var res = $http.post('/PAAS-GUI/rest/registerAndLoginService/login',userData);
-		alert("after AngAjaxJqeryCall");
 		res.success(function(data, status, headers, config) {
 			
 			alert("Inside Success");

@@ -22,7 +22,6 @@ import com.getusroi.paas.dao.DataBaseOperationFailedException;
 import com.getusroi.paas.dao.ImageRegistryDAO;
 import com.getusroi.paas.rest.RestServiceHelper;
 import com.getusroi.paas.rest.service.exception.ImageRegistryServiceException;
-import com.getusroi.paas.rest.service.exception.UserRegisterAndLoginServiceException;
 import com.getusroi.paas.sdn.service.SDNInterface;
 import com.getusroi.paas.sdn.service.impl.SDNServiceImplException;
 import com.getusroi.paas.sdn.service.impl.SDNServiceWrapperImpl;
@@ -40,7 +39,7 @@ public class ImageRegistryService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public String addImageRegistry(String imageRegistryData,@Context HttpServletRequest req) throws DataBaseOperationFailedException, SDNServiceImplException, ImageRegistryServiceException{
 		logger.debug(".addImageRegistry method of ImageRegistryService");
-		ImageRegistryDAO imageRegistryDAO=new ImageRegistryDAO();
+		ImageRegistryDAO imageRegistryDAO = new ImageRegistryDAO();
 		ObjectMapper mapper = new ObjectMapper();
 		SDNInterface sdnService=new SDNServiceWrapperImpl();
 		String responseMessage=null;
