@@ -13,18 +13,25 @@ myimageregistry.controller('MainCtrl', function ($scope,$http) {
  /*============ ImageRegistry REG=============*/
     
     $scope.regImageRegistry = function() {
-    	console.log("Inside (.) regImageRegistry ");
+    
     	console.log($scope.field);
     	var userData = JSON.stringify($scope.field);
-    	var res = $http.post('/paas-gui/rest/imageRegistry/addImageRegistry', userData);
+    	var response = $http.post('/paas-gui/rest/imageRegistry/addImageRegistry', userData);
+    	
+    	JSON.stringify(response);
+    	
+    	 
+    
     	console.log(userData);
 
-    	res.success(function(data, status, headers, config) {
+    	response.success(function(data, status) {
+    		alert("coming to success");
     		$scope.message = data;
-    		$scope.selectImageRegistry();
-    		//document.location.href = '/PAAS-GUI/html/login.html';
+    	
+    		window.location.href="/html/imageregistry.html";
+    		/*window.location.href='http://localhost:8080/paas-gui/html/imageregistry.html';*/
     	});
-    	res.error(function(data, status, headers, config) {
+    	response.error(function(data, status, headers, config) {
     		alert("failure message: " + JSON.stringify({
     			data : data
     		}));
@@ -46,17 +53,20 @@ myimageregistry.controller('MainCtrl', function ($scope,$http) {
     };           
 
     /*=================== delete*====================*/
-  /* 
-    $scope.deleteImageRegistry = function(data) {
-     	var response = $http.get('/PAAS-GUI/rest/imageRegistry/deleteImageRegistry/'+data);
+   
+    $scope.deleteImageRegistry = function(data,username) {
+    	alert(username);
+    	alert("coming delete"+username);
+    	alert(data+" "+username);
+     	var response = $http.get('/paas-gui/rest/imageRegistry/deleteImageRegistry/'+data+'/'+username);
      	response.success(function(data){
-     		$scope.select();
+     		$scope.selectImageRegistry();
      	});
      	response.error(function(data, status, headers, config) {
-                 alert("Error in Fetching Data");
+                 alert("Error in Fetching Data"+data);
          });
      	
-     };*/
+     };
     
     
     

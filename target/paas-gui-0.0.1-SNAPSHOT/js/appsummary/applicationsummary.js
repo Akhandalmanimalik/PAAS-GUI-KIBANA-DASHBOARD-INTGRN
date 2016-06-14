@@ -7,17 +7,16 @@ myvpc.controller('SummaryCtrl', function ($scope,$http) {
 	$scope.services={};
 	$scope.scales = [{portname:'',porttype:'',hostport:'',containerport:''}];
 	$scope.env = [{envkey:'',envvalue:''}];
-	$scope.route= [{type:'',port:'',routetype:'',target:''}];
-	
-	
+	$scope.route= [{type:'',port:'',routetype:'',target:''}];	
     $scope.showModal = false;
     $scope.toggleModal = function(){
+    	alert("comming toggleModal "); 
         $scope.showModal = !$scope.showModal;
     };
     
-    
     $scope.showModal1 = false;
     $scope.toggleModal1 = function(){
+    	alert("comming toggleModal1 "); 
         $scope.showModal1 = !$scope.showModal1;
     };
     
@@ -25,10 +24,11 @@ myvpc.controller('SummaryCtrl', function ($scope,$http) {
       /*================VPC REGISTRATION===================*/
     
     $scope.storeSummary = function() {
-  	  console.log($scope.field);
+    	alert("comming storeSummary "); 
+    	console.log($scope.field);
   
-  	   userData = angular.toJson($scope.field);
-  	   alert(userData);
+  	  userData = angular.toJson($scope.field);
+  	  alert(userData);
   	  var res = $http.post('/PAAS-GUI/rest/applicationService/addApplicantSummary', userData);
   	  console.log(userData);
   	  res.success(function(data, status, headers, config) {
@@ -42,6 +42,7 @@ myvpc.controller('SummaryCtrl', function ($scope,$http) {
   	 
   	};
     $scope.selectSubnetnew = function() {
+    	alert("comming selectSubnetnew ");
 		 console.log("selectSubnetnew");
  	//var response = $http.get('/PAAS-GUI/rest/fetchData/selectVpc');
  	var response = $http.get('/PAAS-GUI/rest/networkservice/getAllSubnet');
@@ -89,6 +90,7 @@ myvpc.controller('SummaryCtrl', function ($scope,$http) {
                 
   	
    $scope.selectappfortag = function(subnet_name) {
+	   alert("comming selectappfortag ");
    	 $scope.scale.cidr;
   		 angular.forEach($scope.fieldss,function(item){
    			   if(item.subnet_name == subnet_name){
@@ -98,51 +100,30 @@ myvpc.controller('SummaryCtrl', function ($scope,$http) {
    }
    });
     }
-  	
-  	
-  	
-  	           /*POPULATE DATA TO TABLE*/
-  
-  	 $scope.selectSummary = function(reponame) {
-  		$scope.reponames;
-	//JSON.stringify(data);
-  		
-  		$scope.isImg=true;
-     	var response = $http.post('/PAAS-GUI/rest/applicationService/getApplicationSummary',reponame);
-     	
-     	response.success(function(data){
-     		$scope.isImg=false;
-     		$scope.reponames = data;
-     		console.log("selectRepo >>>> "+$scope.reponames);
-     	});
-     	response.error(function(data, status, headers, config) {
-                 alert("Error in Fetching Application Summary"+data);
-         });
-     };
+   	  
      //store  services
-     
-     $scope.storeServices = function() {
+      $scope.storeServices = function() {
+    	  alert("comming *** storeServices ");
     	
-    
-    	 angular.forEach($scope.scales,function(value){
+     	 angular.forEach($scope.scales,function(value){
      		
     		 $scope.scale.scales.push(value);
              
                
            })
            
-    	  angular.forEach($scope.env,function(value){
+    	  /*angular.forEach($scope.env,function(value){
      		
     		 $scope.scale.env.push(value);
              
                
-           })
+           })*/
      	 angular.forEach($scope.route,function(value){
      		
     		 $scope.scale.route.push(value);
              
                
-           })
+         })
     
     	   userData = angular.toJson($scope.scale);
     	  //alert("userData "+userData);
@@ -169,6 +150,7 @@ myvpc.controller('SummaryCtrl', function ($scope,$http) {
      //For  Add  Service
      
      $scope.selectServices = function() {
+    	 alert("comming selectServices ");
       	var response = $http.get('/PAAS-GUI/rest/applicationService/getAllApplicationService');
       	response.success(function(data){
       		
@@ -183,45 +165,40 @@ myvpc.controller('SummaryCtrl', function ($scope,$http) {
      
      /*for table*/
      $scope.addNewChoice = function() {
-    	   
+    	 alert("comming addNewChoice");
     	    $scope.scales.push({portname:'',porttype:'',hostport:'',containerport:''});
-    	  };
+    };
     	  
-    	  
-    	  $scope.removeChoice = function(index) {
-    		  
+  	  $scope.removeChoice = function(index) {
+    		  alert("comming removeChoice");
     		    $scope.scales.splice(index,1);
-    		  };
+      };
      
-     
-     /*for table*/
-    		  //Envirnament  add
-    		  $scope.addNewEnvirnament = function() {
-    	    	   
-    	    	    $scope.env.push({envkey:'',envvalue:''});
-    	    	  };
+	  /*for table*/
+	  //Envirnament  add
+	  $scope.addNewEnvirnament = function() {
+	  alert("comming addNewEnvirnament");
+    	    $scope.env.push({envkey:'',envvalue:''});
+     };
     	    	  
-    	    	  
-    	    	  $scope.removeEnvirnament = function(index) {
+     $scope.removeEnvirnament = function(index) {
+    		   alert("comming removeEnvirnament");
+    		   $scope.env.splice(index,1);
+    };
     	    		  
-    	    		    $scope.env.splice(index,1);
-    	    		  };
-    	    		  
-    	    		  //Route  add
-    	    		  $scope.addNewRoute = function() {
-    	    	    	   
-    	    	    	    $scope.route.push({type:'',port:'',routetype:'',target:''});
-    	    	    	  };
+    //Route  add
+    $scope.addNewRoute = function() {
+    alert("comming addNewRoute");
+    $scope.route.push({type:'',port:'',routetype:'',target:''});
+    };
     	    	    	 
-    	    	    	  
-    	    	    	  $scope.removeRoute = function(index) {
-    	    	    		  
-    	    	    		    $scope.route.splice(index,1);
-    	    	    		  };
-     
-     
+    $scope.removeRoute = function(index) {
+    alert("comming removeRoute");
+    $scope.route.splice(index,1);
+    };
      
      $scope.selectSummarydata = function() {
+    	 alert("comming selectSummarydata");
       	var response = $http.get('/PAAS-GUI/rest/applicationService/getAllApplicationSummary');
       	
       	response.success(function(data){
@@ -262,6 +239,7 @@ myvpc.controller('SummaryCtrl', function ($scope,$http) {
      
      /*Delete Service By Name*/
      $scope.deleteServiceByName = function (servicename,envirnoment) {
+    	 alert("deleteServiceByName");
     	 console.log("environment : "+envirnoment);
     	var response = $http.get('/PAAS-GUI/rest/applicationService/deleteServiceByName/'+servicename+"/"+envirnoment);
       	response.success(function(data){
@@ -276,7 +254,7 @@ myvpc.controller('SummaryCtrl', function ($scope,$http) {
      $scope.scaling = function () {
     	
     	 
-    	
+    	alert("comgin to scalling");
     	var response = $http.put('/PAAS-GUI/rest/applicationService/updateMarathonInstace/',$scope.scaling.instance);
       	response.success(function(data){
       		

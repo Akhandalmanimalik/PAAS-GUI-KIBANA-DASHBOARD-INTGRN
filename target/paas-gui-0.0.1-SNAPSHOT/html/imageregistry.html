@@ -6,26 +6,49 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <title>Image Registry</title>
- 
-<script src="../assets/global/plugins/jquery.min.js" type="text/javascript"></script>
-<script src="../assets/global/plugins/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
-<script src="../assets/global/scripts/angular.min.js" type="text/javascript"></script>
-<script src="../assets/pages/scripts/image-registry/imageregistry.js" type="text/javascript"></script> 
 
-<link href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&subset=all" rel="stylesheet" type="text/css" />
-<link href="../assets/global/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
-<link href="../assets/global/plugins/simple-line-icons/simple-line-icons.min.css" rel="stylesheet" type="text/css" />
-<link href="../assets/global/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-<link href="../assets/global/plugins/uniform/css/uniform.default.css" rel="stylesheet" type="text/css" />
-<link href="../assets/global/css/components.min.css" rel="stylesheet" id="style_components" type="text/css" />
-<link href="../assets/pages/css/layout.min.css" rel="stylesheet" type="text/css" />
-<link href="../assets/pages/css/light.min.css" rel="stylesheet" type="text/css" id="style_color" />
-<link rel="shortcut icon" href="favicon.ico" /> 
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Image Registry</title>
+
+<script src="../assets/global/plugins/jquery.min.js"
+	type="text/javascript"></script>
+<script src="../assets/global/plugins/bootstrap/js/bootstrap.min.js"
+	type="text/javascript"></script>
+<script src="../assets/global/scripts/angular.min.js"
+	type="text/javascript"></script>
+<script src="../assets/pages/scripts/image-registry/imageregistry.js"
+	type="text/javascript"></script>
+
+<link
+	href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&subset=all"
+	rel="stylesheet" type="text/css" />
+<link
+	href="../assets/global/plugins/font-awesome/css/font-awesome.min.css"
+	rel="stylesheet" type="text/css" />
+<link
+	href="../assets/global/plugins/simple-line-icons/simple-line-icons.min.css"
+	rel="stylesheet" type="text/css" />
+<link href="../assets/global/plugins/bootstrap/css/bootstrap.min.css"
+	rel="stylesheet" type="text/css" />
+<link href="../assets/global/plugins/uniform/css/uniform.default.css"
+	rel="stylesheet" type="text/css" />
+<link href="../assets/global/css/components.min.css" rel="stylesheet"
+	id="style_components" type="text/css" />
+<link href="../assets/pages/css/layout.min.css" rel="stylesheet"
+	type="text/css" />
+<link href="../assets/pages/css/light.min.css" rel="stylesheet"
+	type="text/css" id="style_color" />
+<link rel="shortcut icon" href="favicon.ico" />
+</head>
 </head>
 
-<body class="page-container-bg-solid page-header-fixed page-sidebar-closed-hide-logo">
+<body
+	class="page-container-bg-solid page-header-fixed page-sidebar-closed-hide-logo">
 
-	<div ng-app="myimageregistry" ng-controller="MainCtrl" ng-init="selectImageRegistry()">
+	<div ng-app="myimageregistry" ng-controller="MainCtrl"
+		ng-init="selectImageRegistry()">
 
 		<div class="page-head">
 			<!-- BEGIN PAGE TITLE -->
@@ -36,75 +59,26 @@
 
 		</div>
 
-			<hr>
-			<button type="button" ng-click="toggleModal()" class="btn green"> Add Image Registry </button>
-			<br>
-				<modal title="Add Image Registry" visible="showModal">
-
-			<form role="form">
-				<div class="form-group">
-					<label for="name">Name*</label> <input type="text"
-						class="form-control" id="name"
-						placeholder="Name of the Docker registry" ng-model="field.name"/>
-				</div>
-
-				<div class="form-group">
-					<label for="location">Location*</label> <input type="text"
-						class="form-control" id="location"
-						placeholder="URL of the Docker registry" ng-model="field.location"/>
-				</div>
- 
-				<!-- drop-down menu for version -->
-
-				<div class="form-group">
-					<label for="version">Version</label> <select class="form-control" ng-model="field.version">
-						<option value="A">V1</option>
-						<option value="B">V2</option>
-					</select>
-				</div>
-
-				<!-- end of drop-down menu  -->
-				
-				<div class="form-group">
-					<label for="user_name">User Name</label> <input type="text"
-						class="form-control" id="user_name" placeholder="User Name" ng-model="field.user_name"/>
-				</div>
-
-				<div class="form-group">
-					<label for="password">Password</label> <input type="text"
-						class="form-control" id="password" placeholder="Password" ng-model="field.password"/>
-				</div>
-				<!-- start function of closing the button -->
-
-				<div class="modal-footer" style="background: #ccefff">
-					<div class="bootstrap-dialog-footer">
-						<div class="bootstrap-dialog-footer-buttons">
-							
-							<button type="button"class="btn btn-danger btn-nirmata col-xs-2"data-dismiss="modal">Cancel</button>
-							<button class="btn btn-primary btn-nirmata" data-dismiss="modal" ng-click="regImageRegistry()">Add</button>
-							
-						</div>
-					</div>
-				</div>
-				<!-- close the function of closing the button -->
-			</form>
-
-			</modal>
-	
-
+		<hr>
+		<button type="button"
+			OnClick=" location.href='image-registry-wizard.html' "
+			class="btn green">Add Image Registry</button>
+		<br>
+		 
 		<hr />
-			<div class="table-scrollable">
-				<table class="table table-bordered table-hover">
-					<thead>
-						<tr id="tableheader">
-							<th width="25%">Name</th>
-							<th width="25%">Location</th>
-							<th width="10%">Version</th>
-							<th width="20%">UserName</th>
-							<th width="10%">Status</th>
-							<th width="10%">action</th>
-							
-						</tr>
+		<div class="table-scrollable">
+			<table class="table table-bordered table-hover">
+				<thead>
+					<tr id="tableheader">
+						<th width="15%">Name</th>
+						<th width="15%">Location</th>
+						<th width="10%">Version</th>
+						<th width="10%">UserName</th> 
+						<th width="10%">Delete</th>
+						<th width="10%">update</th>
+						
+					
+					</tr>
 					</thead>
 				 	
 				<tbody>
@@ -113,13 +87,10 @@
 					<td>{{field.location}}</td>
 					<td>{{field.version}}</td>
 					<td>{{field.user_name}}</td>
+				
 					
-					<td></td>
-					
-					<td><button ng-click="deleteImageRegistry(field.name)"
-									class="btn btn-danger">Delete</button>
-								<button ng-click="updateImageRegistry(field.name)"
-									class="btn btn-primary">Update</button></td>
+			<td align="center"><button ng-click="deleteImageRegistry(field.name,field.user_name)" class="btn btn-danger"><i class="fa fa-remove"></button></td>
+						<td align="center"><button ng-click="updateImageRegistry(field.name)" class="btn btn-primary"><i class="fa fa-undo"></button></td>
 				</tr>
 				</tbody>
 				</table>

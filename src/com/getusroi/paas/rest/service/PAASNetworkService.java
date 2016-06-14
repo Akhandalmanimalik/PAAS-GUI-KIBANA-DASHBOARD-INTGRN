@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import com.getusroi.paas.dao.DataBaseOperationFailedException;
 import com.getusroi.paas.dao.NetworkDAO;
+import com.getusroi.paas.dao.SubnetDAO;
 import com.getusroi.paas.helper.PAASConstant;
 import com.getusroi.paas.helper.PAASGenericHelper;
 import com.getusroi.paas.helper.ScriptService;
@@ -36,22 +37,28 @@ import com.google.gson.Gson;
 
 @Path("/networkservice")
 public class PAASNetworkService {
-	 static final Logger logger = LoggerFactory.getLogger(PAASNetworkService.class);
+	 static final Logger LOGGER = LoggerFactory.getLogger(PAASNetworkService.class);
 
 	 static final String TENANT="tenant";
 	 @POST
 	 @Path("/addVPC")
 	 @Consumes(MediaType.APPLICATION_JSON)
-	public void addVPC(String vpcData) throws DataBaseOperationFailedException, PAASNetworkServiceException{
-		logger.debug(".addVPC method of PAASNetworkService");
+	public void addVPC(String vpcData,@Context HttpServletRequest req) throws DataBaseOperationFailedException, PAASNetworkServiceException{
+		LOGGER.debug(".addVPC method of PAASNetworkService");
 		ObjectMapper mapper = new ObjectMapper();
 		NetworkDAO networkDAO=new NetworkDAO();
+		RestServiceHelper restServiceHelper = new RestServiceHelper();
 		try {
+			
 			VPC vpc=mapper.readValue(vpcData,VPC.class);
-			vpc.setVpcId(PAASGenericHelper.getCustomUUID(PAASConstant.VPC_PREFIX));
+			if (vpc != null) {
+			HttpSession session = req.getSession(true);
+			vpc.setTenant_id(restServiceHelper.convertStringToInteger( session.getAttribute("id")+""));
+			//vpc.setVpcId(PAASGenericHelper.getCustomUUID(PAASConstant.VPC_PREFIX));
 			networkDAO.registerVPC(vpc);
+			}
 		} catch (IOException e) {
-			logger.error("Error in reading data : "+vpcData+" using object mapper in addVPC");
+			LOGGER.error("Error in reading data : "+vpcData+" using object mapper in addVPC",e);
 			throw new PAASNetworkServiceException("Error in reading data : "+vpcData+" using object mapper in addVPC");
 		}
 		
@@ -61,7 +68,7 @@ public class PAASNetworkService {
 	 @Path("/getAllVPC")
 	 @Produces(MediaType.APPLICATION_JSON)
 	 public String getAllVPC() throws DataBaseOperationFailedException{
-		 logger.debug(".getAllVPC method of PAASNetworkService");
+		 LOGGER.debug(".getAllVPC method of PAASNetworkService");
 		 NetworkDAO networkDAO=new NetworkDAO();
 		 List<VPC> vpcList=networkDAO.getAllVPC();
 		 Gson gson=new Gson();
@@ -72,20 +79,35 @@ public class PAASNetworkService {
 	 @GET
 	 @Path("/getAllACL")
 	 @Produces(MediaType.APPLICATION_JSON)
-	 public String getAllACL() throws DataBaseOperationFailedException{
-		 logger.debug(".getAllACL method of PAASNetworkService");
-		 NetworkDAO networkDAO=new NetworkDAO();
-		 List<ACL> aclList=networkDAO.getAllACL();
-		 Gson gson=new Gson();
-		 String aclInJsonString=gson.toJson(aclList);
-		 return aclInJsonString;
-	 }//end of method getAllACL
+	 public String getAllACL(@Context HttpServletRequest req) throws DataBaseOperationFailedException{
+			LOGGER.debug("coming inside pass network of get all acl");
+			NetworkDAO networkDAO = new NetworkDAO();
+			RestServiceHelper restServiceHelper = new RestServiceHelper();
+			String aclInJsonString = null;
+			ACL acl=new ACL();
+			try {
+
+				HttpSession session = req.getSession(true);
+				acl.setTenantId((int)session.getAttribute("id"));
+				int tenant_id = acl.getTenantId();
+			
+				List<ACL> aclList = networkDAO.getAllACL(tenant_id );
+				Gson gson = new Gson();
+				aclInJsonString = gson.toJson(aclList);
+				LOGGER.debug(""+aclInJsonString);
+				}
+			 catch (Exception e) {
+					e.printStackTrace();
+	
+				}
+			return aclInJsonString;
+		}//end of method getAllACL
 	 
 	 @GET
 	 @Path("/deleteVPCByName/{vpcName}")
 	 @Produces(MediaType.TEXT_PLAIN)
 	public String deleteVPCByName(@PathParam("vpcName") String vpcName) throws DataBaseOperationFailedException {
-		 logger.debug(".deleteVPCByName method of PAASNetworkService");
+		 LOGGER.debug(".deleteVPCByName method of PAASNetworkService");
 		 NetworkDAO networkDAO=new NetworkDAO();
 		 networkDAO.deleteVPCByName(vpcName);
 		 return "vpc with name : "+vpcName+" is delete successfully";
@@ -95,14 +117,14 @@ public class PAASNetworkService {
 	 @Path("/updateVPC")
 	 @Consumes(MediaType.APPLICATION_JSON)
 	public void updateVPC(String vpcData) throws DataBaseOperationFailedException, PAASNetworkServiceException{
-		logger.debug(".updateVPC method of PAASNetworkService");
+		LOGGER.debug(".updateVPC method of PAASNetworkService");
 		ObjectMapper mapper = new ObjectMapper();
 		NetworkDAO networkDAO=new NetworkDAO();
 		try {
 			VPC vpc=mapper.readValue(vpcData,VPC.class);			
 			networkDAO.updateVPCByNameAndVPCId(vpc);
 		} catch (IOException e) {
-			logger.error("Error in reading data : "+vpcData+" using object mapper in updateVPC");
+			LOGGER.error("Error in reading data : "+vpcData+" using object mapper in updateVPC");
 			throw new PAASNetworkServiceException("Error in reading data : "+vpcData+" using object mapper in updateVPC");
 		}		
 	}//end of method updateVPC
@@ -111,7 +133,7 @@ public class PAASNetworkService {
 	 @Path("/addSubnet")
 	 @Consumes(MediaType.APPLICATION_JSON)
 	 public void addSubnet(String subnetData,@Context HttpServletRequest request) throws DataBaseOperationFailedException, SDNServiceImplException, PAASNetworkServiceException{
-		 logger.debug(".updateVPC method of PAASNetworkService");
+		 LOGGER.debug(".updateVPC method of PAASNetworkService");
 		 ObjectMapper mapper = new ObjectMapper();
 		 NetworkDAO networkDAO=new NetworkDAO();
 		 
@@ -152,7 +174,7 @@ public class PAASNetworkService {
 				throw new PAASNetworkServiceException("no VPC exist with the vpc name "+subnet.getVpc_name());
 			}
 		} catch (IOException |InterruptedException e) {
-			logger.debug("Error in reading data : "+subnetData+" using object mapper in addSubnet");
+			LOGGER.debug("Error in reading data : "+subnetData+" using object mapper in addSubnet");
 			throw new PAASNetworkServiceException("Error in reading data : "+subnetData+" using object mapper in addSubnet");
 		} 
 		
@@ -164,12 +186,12 @@ public class PAASNetworkService {
 	 @Produces(MediaType.APPLICATION_JSON)
 	 public String getAllSubnet(@Context HttpServletRequest request) throws DataBaseOperationFailedException{
 		 
-		 logger.debug(".getAllSubnet method of PAASNetworkService");
+		 LOGGER.debug(".getAllSubnet method of PAASNetworkService");
 		 
 		 HttpSession session=request.getSession(false);
 			int id=(int)session.getAttribute("id");
 		
-		 NetworkDAO networkDAO=new NetworkDAO();
+		NetworkDAO networkDAO=new NetworkDAO();
 		 List<Subnet> subnetList=networkDAO.getAllSubnetByUserId(id);
 		 Gson gson=new Gson();
 		 String subnetInJsonString=gson.toJson(subnetList);
@@ -181,7 +203,7 @@ public class PAASNetworkService {
 	 @Path("/deleteSubnetByName/{subnetName}")
 	 @Produces(MediaType.TEXT_PLAIN)
 	public String deleteSubnetByName(@PathParam("subnetName") String subnetName) throws DataBaseOperationFailedException {
-		 logger.debug(".deleteVPCByName method of PAASNetworkService");
+		 LOGGER.debug(".deleteVPCByName method of PAASNetworkService");
 		 NetworkDAO networkDAO=new NetworkDAO();
 		 networkDAO.deleteSubnetBySubnetName(subnetName);
 		 return "subnet with name : "+subnetName+" is delete successfully";
@@ -191,14 +213,14 @@ public class PAASNetworkService {
 	 @Path("/updateSubnet")
 	 @Consumes(MediaType.APPLICATION_JSON)
 	public void updateSubnet(String subnetData) throws DataBaseOperationFailedException, PAASNetworkServiceException{
-		logger.debug(".updateSubnet method of PAASNetworkService");
+		LOGGER.debug(".updateSubnet method of PAASNetworkService");
 		ObjectMapper mapper = new ObjectMapper();
 		NetworkDAO networkDAO=new NetworkDAO();
 		try {
 			Subnet subnet=mapper.readValue(subnetData,Subnet.class);			
 			networkDAO.updateSubnetBySubnetIDAndSubnetName(subnet);
 		} catch (IOException e) {
-			logger.error("Error in reading data : "+subnetData+" using object mapper in updateSubnet");
+			LOGGER.error("Error in reading data : "+subnetData+" using object mapper in updateSubnet");
 			throw new PAASNetworkServiceException("Error in reading data : "+subnetData+" using object mapper in updateSubnet");
 		}		
 	}//end of method updateSubnet
@@ -207,28 +229,21 @@ public class PAASNetworkService {
 	 @Path("/addACLRule")
 	 @Consumes(MediaType.APPLICATION_JSON)
 	 public void addACLRule(String aclData,@Context HttpServletRequest req) throws SDNServiceImplException, DataBaseOperationFailedException, PAASNetworkServiceException{
-		 logger.debug(".addACLRule method of PAASNetworkService");
+		 LOGGER.debug(".addACLRule method of PAASNetworkService");
 		 ObjectMapper mapper = new ObjectMapper();
 		 NetworkDAO networkDAO=new NetworkDAO();
 		 SDNInterface sdnService = new SDNServiceWrapperImpl();
-		 RestServiceHelper restServcHelper = new RestServiceHelper();
 		 boolean flowFlag=false;
 		 try {
 			ACL acl = mapper.readValue(aclData, ACL.class);			
-				
-				logger.debug("comming to before >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-				flowFlag=sdnService.installFlow(acl.getAclName(), acl.getSrcIp(), acl.getDestIP(),PAASConstant.ACL_PASS_ACTION_KEY);
-//				flowFlag = sdnService.installFlow(acl.getAclName(), acl.getSrcIp(), acl.getDestIP(),PAASConstant.ACL_OTHER_ACTION_KEY);
-				logger.debug("comming to after>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-				HttpSession session = req.getSession(true);
-				if(session != null && acl != null)
-					acl.setTenant_id(restServcHelper.convertStringToInteger(session.getAttribute("id")+""));
-				
-			if(flowFlag){
+//			flowFlag = sdnService.installFlow(acl.getAclName(), acl.getSourceIp(), acl.getDestinationIp(),PAASConstant.ACL_PASS_ACTION_KEY);
+			HttpSession session = req.getSession(true);
+			if(acl != null)
+				acl.setTenantId((int)session.getAttribute("id"));
 				networkDAO.insertACL(acl);
-			}
+			
 		} catch (IOException e) {
-			logger.error("Error in reading data : "+aclData+" using object mapper in addACLRule");
+			LOGGER.error("Error in reading data : "+aclData+" using object mapper in addACLRule");
 			throw new PAASNetworkServiceException("Error in reading data : "+aclData+" using object mapper in addACLRule");
 		}
 	 }//end of method addACLRule
@@ -237,12 +252,33 @@ public class PAASNetworkService {
 	 @Path("/getAllACLNames")
 	 @Produces(MediaType.APPLICATION_JSON)
 	 public String getAllACLNames() throws DataBaseOperationFailedException{
-		 logger.debug(".getAllACL method of PAASNetworkService");
+		 LOGGER.debug(".getAllACL method of PAASNetworkService");
 		 NetworkDAO networkDAO=new NetworkDAO();
 		 List<String> aclList=networkDAO.getAllACLNames();
 		 Gson gson=new Gson();
 		 String aclInJsonString=gson.toJson(aclList);
 		 return aclInJsonString;
 	 }//end of method getAllACLNames
+	 
+	 	@GET
+		@Path("/deleteACLByNameUsingTenantId/{aclName}")
+		@Produces(MediaType.TEXT_PLAIN)
+		public String deleteACLByNameUsingTenantId(@PathParam("aclName") String aclName,@Context HttpServletRequest req)
+				throws DataBaseOperationFailedException {
+	 		LOGGER.debug(".deleteAclByName method of PAASNetworkService");
+	 		LOGGER.debug("Name is"+aclName);
+			
+			
+			ObjectMapper mapper = new ObjectMapper();
+			NetworkDAO networkDAO = new NetworkDAO();
+			RestServiceHelper restServiceHelper = new RestServiceHelper();
+			HttpSession session = req.getSession(true);
+			
+			int tenant_id = restServiceHelper.convertStringToInteger(session
+					.getAttribute("id") + "");
+			
+			networkDAO.deleteACLByName(aclName,tenant_id);
+			return "acl with name : " + aclName + " is delete successfully";
+		}// end 
 	 
 }

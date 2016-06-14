@@ -43,9 +43,10 @@ public class PoliciesDAO {
 	public static final String INSERT_RESOURCE_SELECTION_QUERY  = "INSERT INTO resource_selection VALUES(?,?,?,?,?,?,?)";
 	public static final String SELECT_ALL_RESOURCE_SELECTION = "SELECT * FROM resource_selection";
 	public static final String DELETE_RESOURCE_SELECTION_BY_RANK = "DELETE from resource_selection WHERE rank = ?";
-	public static final String INSERT_CONTAINER_TYPES_QUERY = "INSERT INTO container_types VALUES(?,?,?,?)";
-	public static final String SELECT_ALL_CONTAINER_TYPE_QUERY = "SELECT * FROM container_types";
-	public static final String REMOVE_CONTAINER_TYPES_BY_NAME = "DELETE FROM container_types WHERE name = ?";
+	public static final String INSERT_CONTAINER_TYPES_QUERY = "INSERT INTO container_type (container_type,memory,description,tenan_id,createdDTM) VALUES(?,?,?,?,NOW())";
+	public static final String SELECT_ALL_CONTAINER_TYPE_QUERY = "SELECT * FROM container_type";
+	public static final String GET_CONTAINER_TYPE_BY_TENANT_ID_QUERY = "SELECT * FROM container_type where tenan_id=?";
+	public static final String REMOVE_CONTAINER_TYPES_BY_NAME = "DELETE FROM container_type WHERE container_type = ?";
 	
 	/**
 	 * this method is used to insert all values of scaling and recovery
@@ -554,10 +555,10 @@ public class PoliciesDAO {
 			connection = dataBaseConnectionFactory.getConnection(MYSQL_DB);
 			preparedStatement = (PreparedStatement) connection.prepareStatement(INSERT_CONTAINER_TYPES_QUERY);
 			preparedStatement.setString(1, containerTypes.getName());
-			preparedStatement.setInt(2, containerTypes.getCpuShares());
-			preparedStatement.setInt(3, containerTypes.getMemory());
-			preparedStatement.setString(4, containerTypes.getDescription());
-
+			preparedStatement.setInt(2, containerTypes.getMemory());
+			preparedStatement.setString(3, containerTypes.getDescription());
+			preparedStatement.setInt(4, containerTypes.getTenantId());
+			
 			preparedStatement.executeUpdate();
 						
 		} catch (ClassNotFoundException | IOException e) {
@@ -598,11 +599,55 @@ public class PoliciesDAO {
 			resultSet = preparedStatement.executeQuery();
 			while (resultSet.next()) {
 				ContainerTypes containerTypes = new ContainerTypes();
-				containerTypes.setName(resultSet.getString("name"));
-				containerTypes.setCpuShares(resultSet.getInt("cpu_shares"));
+				containerTypes.setName(resultSet.getString("container_type"));
 				containerTypes.setMemory(resultSet.getInt("memory"));
 				containerTypes.setDescription(resultSet.getString("description"));
+				containerTypesList.add(containerTypes);
+			}
 
+		} catch (ClassNotFoundException | IOException e) {
+			logger.error("Unable to get container types from db ");
+			throw new DataBaseOperationFailedException("Unable to get container types from db",e);
+		} catch(SQLException e) {
+			if(e.getErrorCode() == 1064) {
+				String message = "Unable to get container types from db because: " + PAASErrorCodeExceptionHelper.exceptionFormat(PAASConstant.ERROR_IN_SQL_SYNTAX);
+				throw new DataBaseOperationFailedException(message, e);
+			} else if(e.getErrorCode() == 1146) {
+				String message = "Unable to get container types from db because: " + PAASErrorCodeExceptionHelper.exceptionFormat(PAASConstant.TABLE_NOT_EXIST);
+				throw new DataBaseOperationFailedException(message, e);
+			} else {
+				throw new DataBaseOperationFailedException("Unable to get container types from db ", e);
+			}
+		} finally {
+			DataBaseHelper.dbCleanup(connection, preparedStatement, resultSet);
+		}
+
+		return containerTypesList;
+	} // end of getAllContainerTypesData
+	
+	/**
+	 * this method is used to get all data from container_type table
+	 * @return : it return list of data from container_table
+	 * @throws DataBaseOperationFailedException : Unable to fetch data from db
+	 */
+	public List<ContainerTypes> getAllContainerTypesByTenantId(int tenantId) throws DataBaseOperationFailedException {
+		logger.debug(".getAllContainerTypesByTenantId (.) of PoliciesDAO");
+		DataBaseConnectionFactory dataBaseConnectionFactory = new DataBaseConnectionFactory();
+		List<ContainerTypes> containerTypesList = new ArrayList<ContainerTypes>();
+		Connection connection = null;
+		PreparedStatement preparedStatement = null;
+		ResultSet resultSet = null;
+		
+		try {
+			connection = dataBaseConnectionFactory.getConnection(MYSQL_DB);
+			preparedStatement = (PreparedStatement) connection.prepareStatement(GET_CONTAINER_TYPE_BY_TENANT_ID_QUERY);
+			preparedStatement.setInt(1, tenantId);
+			resultSet = preparedStatement.executeQuery();
+			while (resultSet.next()) {
+				ContainerTypes containerTypes = new ContainerTypes();
+				containerTypes.setName(resultSet.getString("container_type"));
+				containerTypes.setMemory(resultSet.getInt("memory"));
+				containerTypes.setDescription(resultSet.getString("description"));
 				containerTypesList.add(containerTypes);
 			}
 

@@ -9,12 +9,15 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.codec.binary.Base64;
@@ -27,6 +30,7 @@ import com.getusroi.paas.dao.DataBaseOperationFailedException;
 import com.getusroi.paas.dao.EnvironmentDAO;
 import com.getusroi.paas.dao.ImageRegistryDAO;
 import com.getusroi.paas.helper.PAASConstant;
+import com.getusroi.paas.rest.RestServiceHelper;
 import com.getusroi.paas.rest.service.exception.EnvironmentTypeServiceException;
 import com.getusroi.paas.vo.ApplicantSummary;
 import com.getusroi.paas.vo.EnvironmentType;
@@ -42,25 +46,31 @@ import com.google.gson.Gson;
 @Path("/environmentTypeService")
 public class EnvironmentTypeService {
 
-	private static final Logger LOG = LoggerFactory.getLogger(EnvironmentTypeService.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(EnvironmentTypeService.class);
 
 	@POST
 	@Path("/insertEnvironmentType")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public void insertEnvironmentType(String environmentTypeData)
+	public void insertEnvironmentType(String environmentTypeData,@Context HttpServletRequest req)
 			throws EnvironmentTypeServiceException, DataBaseOperationFailedException {
 
-		LOG.debug(".insertEnvironmentType method of EnvironmentTypeService");
+		LOGGER.debug(".insertEnvironmentType method of EnvironmentTypeService");
 		ObjectMapper mapper = new ObjectMapper();
 		EnvironmentDAO environmentDAO = new EnvironmentDAO();
 
 		try {
+			HttpSession session = req.getSession(true);
+			LOGGER.debug(".before>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 			EnvironmentType environmentTypes = mapper.readValue(environmentTypeData, EnvironmentType.class);
+			LOGGER.debug(".after>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+
+			if(environmentTypes != null)
+				environmentTypes.setTenantId((int)session.getAttribute("id"));
 			environmentDAO.insertEnvironmentType(environmentTypes);
 		} catch (IOException e) {
-			LOG.error("Error in reading data : " + environmentTypeData + " using object mapper in environmentType");
+			LOGGER.error("Error in reading data : " + environmentTypeData + " using object mapper in environmentType");
 			throw new EnvironmentTypeServiceException(
-					"Error in reading data : " + environmentTypeData + " using object mapper in addApplicationSummary");
+					"Error in reading data : " + environmentTypeData + " using object mapper in insertEnvironmentType");
 		}
 
 	} // end of insertEnvironmentType method
@@ -70,8 +80,8 @@ public class EnvironmentTypeService {
 	@Path("/getAllEnvironmentType")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getEnvironmentType() throws EnvironmentTypeServiceException, DataBaseOperationFailedException {
-		LOG.debug(".getEnvironmentType of EnvironmentTypeService");
-		List<EnvironmentType> environmentTypeList = new ArrayList<>();
+		LOGGER.debug(".getEnvironmentType of EnvironmentTypeService");
+		List<EnvironmentType> environmentTypeList = new ArrayList<EnvironmentType>();
 		EnvironmentDAO environmentDAO = new EnvironmentDAO();
 		environmentTypeList = environmentDAO.getAllEnvironmentType();
 		Gson gson = new Gson();
@@ -83,7 +93,7 @@ public class EnvironmentTypeService {
 	@Path("/deleteEnvironmentByName/{name}")
 	public void deleteEnvironment(@PathParam("name") String name)
 			throws DataBaseOperationFailedException, EnvironmentTypeServiceException {
-		LOG.debug(".deleteEnvironment of EnvironmentTypeService");
+		LOGGER.debug(".deleteEnvironment of EnvironmentTypeService");
 		EnvironmentDAO environmentDAO = new EnvironmentDAO();
 		environmentDAO.deleteEnvironmentTypeByName(name);
 	} // end of deleteEnvironment method
@@ -92,7 +102,7 @@ public class EnvironmentTypeService {
 	@Path("/getAllEnvironamentList")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getEnvironmentList() throws DataBaseOperationFailedException {
-		LOG.debug(".getEnvironmentList of EnvironmentTypeService");
+		LOGGER.debug(".getEnvironmentList of EnvironmentTypeService");
 		List<Environments> customers = new ArrayList<Environments>();
 		EnvironmentDAO environmentDAO = new EnvironmentDAO();
 		customers = environmentDAO.getAllEnvironmentsList();
@@ -116,27 +126,32 @@ public class EnvironmentTypeService {
 	@POST
 	@Path("/getImageRepositoryFromSummary")    
 	@Produces(MediaType.APPLICATION_JSON)
-	public String getImageRepository(String appName) throws DataBaseOperationFailedException, EnvironmentTypeServiceException {		
-		LOG.info(".getImageRepository of EnvironmentsTypeService: ");		
+	public String getImageRepository(String appName,@Context HttpServletRequest req) throws DataBaseOperationFailedException, EnvironmentTypeServiceException {		
+		LOGGER.info(".getImageRepository of EnvironmentsTypeService: ");		
 		String response=null;
-		EnvironmentDAO environmentDAO=new EnvironmentDAO();
+		RestServiceHelper restServiceHelper = new RestServiceHelper();
+		EnvironmentDAO environmentDAO = new EnvironmentDAO();
 		ImageRegistryDAO imageRegistryDAO=new ImageRegistryDAO();
 		ApplicantSummary applicantSummary =environmentDAO.selectImageRepositoryFromRepositoryName(appName);
+		
+		HttpSession session = req.getSession(true);
+		int tenantId=restServiceHelper.convertStringToInteger(session.getAttribute("id")+"");
+		
 		if(applicantSummary !=null){
-		ImageRegistry imageRegistry=imageRegistryDAO.getImageRegistryByName(applicantSummary.getImageRegistry().trim());
+		ImageRegistry imageRegistry=imageRegistryDAO.getImageRegistryByName(applicantSummary.getImageRegistry().trim(),tenantId);
 		
 		if(imageRegistry != null){
 			String baseURL = PAASConstant.HTTPS_PROTOCOL_KEY+imageRegistry.getLocation() +PAASConstant.ALL_REPOSTORY_KEY+imageRegistry.getName()+PAASConstant.ALL_TAGS_KEY;
 			String authentication=imageRegistry.getUser_name() + ":" + imageRegistry.getPassword();
 			try {
 				 response=getHttpResponse(baseURL, authentication, "GET");
-				LOG.debug("http response  : "+response);				
+				LOGGER.debug("http response  : "+response);				
 			} catch (IOException e) {
-				LOG.error("Unable to get the http response using base url :"+baseURL+", authentication : "+authentication);
+				LOGGER.error("Unable to get the http response using base url :"+baseURL+", authentication : "+authentication);
 				throw new EnvironmentTypeServiceException("Unable to get the http response using base url :"+baseURL+", authentication : "+authentication);
 			}
 		}else{
-			LOG.debug("No image repository availabel with name : "+applicantSummary.getImageRegistry().trim());
+			LOGGER.debug("No image repository availabel with name : "+applicantSummary.getImageRegistry().trim());
 		}	
 		}//end of if(applicantSummary !=null)
 		return response;
@@ -147,7 +162,7 @@ public class EnvironmentTypeService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public String insertEnvironmentsData(String environmentData) throws DataBaseOperationFailedException {
 		
-		LOG.debug(".insertEnvironmentsData of EnvironmentsTypeService: " + environmentData);
+		LOGGER.debug(".insertEnvironmentsData of EnvironmentsTypeService: " + environmentData);
 		List<Environments> environmentsList = new ArrayList<>();
 		JSONObject jsonObject =new JSONObject(environmentData);
 		jsonObject.put("containername", "dev.fuse");
@@ -163,7 +178,7 @@ public class EnvironmentTypeService {
 			EnvironmentDAO environmentDAO = new EnvironmentDAO();
 			environmentDAO.insertAllEnvironmentsData(environments);
 		} catch (IOException e) {
-			LOG.debug("Unable to read value");
+			LOGGER.debug("Unable to read value");
 		}
 		Gson gson = new Gson();
 		String environmentsLists = gson.toJson(environmentsList);
@@ -181,7 +196,7 @@ public class EnvironmentTypeService {
 	 * @throws IOException : Unable to connect to url using http client
 	 */
 	private String getHttpResponse(String baseURL,String authentication,String httpRequestMethod) throws IOException{
-		LOG.debug(".getHttpResponse method of EnvironmentTypeService");	
+		LOGGER.debug(".getHttpResponse method of EnvironmentTypeService");	
 		StringBuffer result = new StringBuffer();
 		URL url = new URL(baseURL);       
 		//String authStr = summary.getUser_name() + ":" + summary.getPassword();
@@ -194,7 +209,7 @@ public class EnvironmentTypeService {
         connection.setRequestProperty("Authorization", "Basic "
                 + encodedAuthStr);
         connection.setRequestProperty("Accept", "application/json");        
-        LOG.debug("Response  Code"+connection.getResponseCode());        
+        LOGGER.debug("Response  Code"+connection.getResponseCode());        
         InputStream content = (InputStream) connection.getInputStream();
         BufferedReader in = new BufferedReader(new InputStreamReader(
                 content));

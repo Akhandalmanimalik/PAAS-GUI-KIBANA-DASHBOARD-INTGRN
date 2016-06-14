@@ -12,9 +12,11 @@ myvpc.controller('VpcCtrl', function ($scope,$http) {
       /*================VPC REGISTRATION===================*/
     
     $scope.regVpc = function() {
+      if ($scope.vpcWizardForm.$valid) {
   	  console.log($scope.field);
+  	  
   	  var userData = JSON.stringify($scope.field);
-  	  var res = $http.post('/PAAS-GUI/rest/networkservice/addVPC', userData);
+  	  var res = $http.post('/paas-gui/rest/networkservice/addVPC', userData);
   	  console.log(userData);
   	  res.success(function(data, status, headers, config) {
   	    $scope.message = data;
@@ -27,13 +29,13 @@ myvpc.controller('VpcCtrl', function ($scope,$http) {
   	      data : data
   	    }));
   	  });
-  	 
+    }
   	};
   	
   	           /*POPULATE DATA TO TABLE*/
   
   	 $scope.selectVpc = function() {
-     	var response = $http.get('/PAAS-GUI/rest/networkservice/getAllVPC');
+     	var response = $http.get('/paas-gui/rest/networkservice/getAllVPC');
      	response.success(function(data){
      		$scope.fields = data;
      	});
@@ -45,7 +47,7 @@ myvpc.controller('VpcCtrl', function ($scope,$http) {
    
      //ACL
      $scope.getAcl = function() {
-      	var response = $http.get('/PAAS-GUI/rest/networkservice/getAllACL');
+      	var response = $http.get('/paas-gui/rest/networkservice/getAllACL');
       	response.success(function(data){
       		
       		$scope.aclist = data;
@@ -63,7 +65,7 @@ myvpc.controller('VpcCtrl', function ($scope,$http) {
   	
 
      $scope.deleteData = function(data) {
-     	var response = $http.get('/PAAS-GUI/rest/networkservice/deleteVPCByName/'+data);
+     	var response = $http.get('/paas-gui/rest/networkservice/deleteVPCByName/'+data);
      	response.success(function(data){
      		$scope.select();
      	});
@@ -75,7 +77,7 @@ myvpc.controller('VpcCtrl', function ($scope,$http) {
      
               /*EDIT VPC DATA*/
      $scope.update = function(data) {
-     	var response = $http.get('/PAAS-GUI/rest/networkservice/updateVPC/'+data);
+     	var response = $http.get('/paas-gui/rest/networkservice/updateVPC/'+data);
      	response.success(function(data){
      		$scope.select();
      	});

@@ -4,6 +4,7 @@ body, h1, h2, h3, h4, h5, h6 {
 .bold.btn, .sbold.btn {
 	letter-spacing:0
 }
+
 .chart-tooltip, .chart-tooltip .label, .chat-form, .dashboard-stat2 .display:after, .dashboard-stat2 .progress-info, .dashboard-stat2 .progress-info .progress, .dashboard-stat:after, .dropdown-menu-v2>li>a, .dropdown-menu>li>a, .feeds li .col1, .feeds li:after, .form .form-actions:after, .general-item-list>.item>.item-head:after, .mt-comments .mt-comment .mt-comment-body .mt-comment-info:after, .portlet-form .form-actions:after, .portlet>.portlet-body, .portlet>.portlet-title:after, .social-icons:after, .tabbable:after, .table-toolbar:after, .tasks-widget .task-footer:after, .tasks-widget:after, .tiles .tile .tile-object:after, .tiles:after, .timeline .timeline-body:after, .widget-news .widget-news-right-body .widget-news-right-body-title {
 	clear:both
 }
@@ -18553,3 +18554,158 @@ transition:all .2s ease-in-out;
 	padding:10px;
 	text-align:center
 }
+
+
+/* PROGRESS BAR*/
+
+#progress-bar
+{
+width: 100%;
+height:80px;
+margin-bottom:20px;
+}
+
+#progress-bar .step
+{
+height:20px;
+background:#32c5d2;
+width:25%;
+margin-top:70px;
+float:left;
+}
+
+#progress-bar .step .circle
+{
+height:40px;
+width:40px;
+background:#32c5d2;
+border-radius:50%;
+float:left;
+margin-top:-60px;
+font-size:16px;
+color:#fff;
+line-height:40px;
+text-align:center;
+}
+
+#progress-bar .stepinactive
+{
+height:20px;
+background:#f4f4f4;
+width:25%;
+margin-top:70px;
+float:left;
+}
+
+#progress-bar .stepinactive .circle
+{
+height:40px;
+width:40px;
+background:#f4f4f4;
+border-radius:50%;
+float:left;
+margin-top:-60px;
+font-size:16px;
+color:#32c5d2;
+line-height:40px;
+text-align:center;
+}
+
+#progress-bar .stepcurrent
+{
+height:20px;
+background: #9bd7e1;
+width:25%;
+margin-top:70px;
+float:left;
+}
+
+#progress-bar .stepcurrent .circle
+{
+height:40px;
+width:40px;
+background:#f4f4f4;
+border-radius:50%;
+float:left;
+margin-top:-60px;
+font-size:16px;
+color:#32c5d2;
+line-height:40px;
+text-align:center;
+}
+
+
+#progress-bar .step .title
+{
+height:40px;
+width:80%;
+font-size:16px;
+color:#000;
+margin-left:50px;
+margin-top:-50px;
+float:left;
+}
+
+
+#progress-bar .stepinactive .title
+{
+height:40px;
+width:80%;
+font-size:16px;
+color:#32c5d2;
+margin-left:50px;
+margin-top:-50px;
+float:left;
+}
+
+#progress-bar .stepcurrent .title
+{
+height:40px;
+width:80%;
+font-size:16px;
+color:#32c5d2;
+margin-left:50px;
+margin-top:-50px;
+float:left;
+}
+
+@media (max-width:800px) {
+
+#progress-bar
+{
+	height:140px;
+	margin-top:70px;
+	margin-bottom:20px;
+
+}
+
+#progress-bar .step
+{
+	float:none;
+	background:#fff;
+	margin-top:30px;
+	width:100%;
+}
+
+#progress-bar .stepcurrent
+{
+	float:none;
+	background:#fff;
+	margin-top:30px;
+	width:100%;
+}
+
+#progress-bar .stepinactive
+{
+	float:none;
+	background:#fff;
+	margin-top:30px;
+	width:100%;
+}
+
+
+}
+
+
+
+/* END PROGRESS BAR*/

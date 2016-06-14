@@ -8,20 +8,23 @@ public class ApplicantUser {
 
 	private String applicantionName;
 	private String description;
-	
+	private int tenant_id;
 	
 
 	public ApplicantUser() {
 
 	}
-
-	public ApplicantUser(String applicantionName, String description) {
+ 
+	public ApplicantUser(String applicantionName, String description,
+			int tenant_id) {
 		super();
 		this.applicantionName = applicantionName;
 		this.description = description;
-
+		this.tenant_id = tenant_id;
 	}
-	
+
+
+
 	public String getApplicantionName() {
 		return applicantionName;
 	}
@@ -38,7 +41,17 @@ public class ApplicantUser {
 		this.description = description;
 	}
 
-	
 
+
+	public int getTenant_id() {
+		return tenant_id;
+	}
+
+
+
+	public void setTenant_id(int tenant_id) {
+		this.tenant_id = tenant_id;
+	}
+ 
 	
 }

@@ -17,7 +17,7 @@ import com.getusroi.paas.helper.PAASGenericHelper;
 import com.getusroi.paas.helper.UnableToLoadPropertyFileException;
 import com.getusroi.paas.marathon.service.IMarathonService;
 import com.getusroi.paas.marathon.service.MarathonServiceException;
-import com.getusroi.paas.vo.AddService;
+import com.getusroi.paas.vo.Service;
 import com.getusroi.paas.vo.EnvironmentVariable;
 import com.getusroi.paas.vo.Scale;
 import com.sun.jersey.api.client.Client;
@@ -157,21 +157,21 @@ public class MarathonService implements IMarathonService {
 	 * @param addService : AddService object
 	 * @throws MarathonServiceException : Error in reuesting data to marathon
 	 */
-	public String postRequestToMarathon(AddService addService) throws MarathonServiceException{
+	public String postRequestToMarathon(Service addService) throws MarathonServiceException{
 		logger.debug(".postRequestToMarathon method of MarathonService");
 		ObjectMapper objectMapper = new ObjectMapper();
-		String appId=addService.getSubnet_name()+"-"+PAASGenericHelper.getCustomUUID();
-		String id=addService.getUserId()+"/"+appId;
+		String appId=addService.getSubnetName()+"-"+PAASGenericHelper.getCustomUUID();
+		String id=addService.getTenantId()+"/"+appId;
 		String script=addService.getRun();
 		int instances=1;
-		String [] array=addService.getSubnet_name().split("-");
+		String [] array=addService.getSubnetName().split("-");
 		String memory=addService.getType();
 		String image=addService.getImageRegistry()+":"+addService.getTag();
 		logger.debug("Image  is"+image);
 		String protocol=addService.getProtocal();		
-		String  failure=addService.getEnvthresold();
+		String  failure=addService.getEnvThreshold()+"";
 		String  timeOut=addService.getEnvtimeout();
-		String  inteval=addService.getEnvinterval();		
+		String  inteval=addService.getEnvInterval()+"";		
 		String environment=array[1];
 		Integer containerport =0;
 		String network=NETWORK;
@@ -179,8 +179,8 @@ public class MarathonService implements IMarathonService {
 		String hostpath=null;
 		String hostkey=null;
 		String containervalue=null;
-		if(addService.getVolume()!=null){
-			 hostpath=addService.getVolume();
+		if(addService.getVolume()+"" !=null){
+			 hostpath=addService.getVolume()+"";
 			 String host[] = hostpath.split(":");
 				 hostkey =host[0].toString();
 				containervalue =host[1].toString();
@@ -269,7 +269,7 @@ public class MarathonService implements IMarathonService {
 	 * @param containerdisk : storage size in String
 	 * @throws MarathonServiceException : Error in attaching NAS storage
 	 */
-	 public void  attachNasStorage(AddService addService,String  containerdisk) throws MarathonServiceException{
+	 public void  attachNasStorage(Service addService,String  containerdisk) throws MarathonServiceException{
 		 logger.debug(".attachNasStorage method of MarathonService");
 		 String input = "{"+
 					"	\"name\": \""+addService.getServiceName()+"\","+
@@ -310,7 +310,7 @@ public class MarathonService implements IMarathonService {
 	  * @param addService : AddService Object
 	  * @return Map<String,String>
 	  */
-	 private Map<String,String> setEnvironment(AddService addService){
+	 private Map<String,String> setEnvironment(Service addService){
 		 logger.debug(".setEnvironment method of MarathonService");
 		 List<EnvironmentVariable> listenv =addService.getEnv();
 			Map<String,String> env = new HashMap<String, String>();
@@ -321,13 +321,13 @@ public class MarathonService implements IMarathonService {
 	 }//end of method setEnvironment
 	 
 	 
-	 private String setHostAndContainerInfo(AddService addService){
+	 private String setHostAndContainerInfo(Service addService){
 		 logger.debug(".setHostAndContainerInfo method of MarathonService");
 		 String hostpath=null;
 			//String hostkey=null;
 			String containervalue=null;
-			if(addService.getVolume()!=null){
-				 hostpath=addService.getVolume();
+			if(addService.getVolume()+"" !=null){
+				 hostpath=addService.getVolume()+"";
 				 String host[] = hostpath.split(":");
 					// hostkey =host[0].toString();
 					containervalue =host[1].toString();

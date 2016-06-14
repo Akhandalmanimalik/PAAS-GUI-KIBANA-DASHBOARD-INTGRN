@@ -12,6 +12,7 @@
 				
 				// function to submit the form after all validation has occurred            
 				$scope.submitForm = function() {
+					
 				console.log("comming inside submit and validation");
 					// check to make sure the form is completely valid
 					if ($scope.userForm.$valid) {
@@ -33,7 +34,7 @@
 							document.location.href = '/paas-gui/application-listing.html';				
 							}else{
 								console.log("Login Error Please Enter Proper Details");
-								document.location.href = '/paas-gui/login.html';				
+								document.location.href = '/paas-gui/login3.html';				
 
 							}
 							

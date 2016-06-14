@@ -51,6 +51,7 @@
 /home/bizruntime/MALIK/workspace/client_ws/PAAS-GUI/src/com/paas_gui/register/CheckLoginDAO.java
 /home/bizruntime/MALIK/workspace/client_ws/PAAS-GUI/src/com/paas_gui/register/Employee.java
 /home/bizruntime/MALIK/workspace/client_ws/PAAS-GUI/src/com/paas_gui/vpc/ResourceSelection.java
+/home/bizruntime/MALIK/workspace/client_ws/PAAS-GUI/src/com/getusroi/paas/dao/ContainerTypesDAO.java
 /home/bizruntime/MALIK/workspace/client_ws/PAAS-GUI/src/com/paas_gui/vpc/FirewallOutbounds.java
 /home/bizruntime/MALIK/workspace/client_ws/PAAS-GUI/src/com/getusroi/paas/vo/EnvironmentVariable.java
 /home/bizruntime/MALIK/workspace/client_ws/PAAS-GUI/src/com/paas_gui/vpc/EnvironmentVariable.java
@@ -67,6 +68,7 @@
 /home/bizruntime/MALIK/workspace/client_ws/PAAS-GUI/src/com/getusroi/paas/rest/service/exception/ApplicationServiceException.java
 /home/bizruntime/MALIK/workspace/client_ws/PAAS-GUI/src/com/getusroi/paas/vo/ResourceSelection.java
 /home/bizruntime/MALIK/workspace/client_ws/PAAS-GUI/src/com/getusroi/paas/rest/service/ImageRegistryService.java
+/home/bizruntime/MALIK/workspace/client_ws/PAAS-GUI/src/com/getusroi/paas/dao/SubnetDAO.java
 /home/bizruntime/MALIK/workspace/client_ws/PAAS-GUI/src/com/paas_gui/vpc/Environments.java
 /home/bizruntime/MALIK/workspace/client_ws/PAAS-GUI/src/com/getusroi/paas/marathon/service/MarathonServiceException.java
 /home/bizruntime/MALIK/workspace/client_ws/PAAS-GUI/src/com/getusroi/paas/db/helper/DataBaseHelper.java
@@ -82,6 +84,7 @@
 /home/bizruntime/MALIK/workspace/client_ws/PAAS-GUI/src/com/getusroi/paas/rest/service/ContainersService.java
 /home/bizruntime/MALIK/workspace/client_ws/PAAS-GUI/src/com/paas_gui/vpc/Vpc_pozo.java
 /home/bizruntime/MALIK/workspace/client_ws/PAAS-GUI/src/com/paas_gui/vpc/ContainerTypes.java
+/home/bizruntime/MALIK/workspace/client_ws/PAAS-GUI/src/com/getusroi/paas/vo/Service.java
 /home/bizruntime/MALIK/workspace/client_ws/PAAS-GUI/src/com/getusroi/paas/sdn/service/impl/HTTPConnectionException.java
 /home/bizruntime/MALIK/workspace/client_ws/PAAS-GUI/src/com/getusroi/paas/vo/Storage.java
 /home/bizruntime/MALIK/workspace/client_ws/PAAS-GUI/src/com/getusroi/paas/dao/StorageDAO.java
@@ -90,7 +93,6 @@
 /home/bizruntime/MALIK/workspace/client_ws/PAAS-GUI/src/com/getusroi/paas/dao/NetworkDAO.java
 /home/bizruntime/MALIK/workspace/client_ws/PAAS-GUI/src/com/getusroi/paas/vo/VPC.java
 /home/bizruntime/MALIK/workspace/client_ws/PAAS-GUI/src/com/getusroi/elastic_search/readonlyrest/ESYMLUsers.java
-/home/bizruntime/MALIK/workspace/client_ws/PAAS-GUI/src/com/getusroi/paas/vo/AddService.java
 /home/bizruntime/MALIK/workspace/client_ws/PAAS-GUI/src/com/paas/network/PostService.java
 /home/bizruntime/MALIK/workspace/client_ws/PAAS-GUI/src/com/getusroi/paas/sdn/service/SDNContant.java
 /home/bizruntime/MALIK/workspace/client_ws/PAAS-GUI/src/com/getusroi/paas/vo/Environments.java

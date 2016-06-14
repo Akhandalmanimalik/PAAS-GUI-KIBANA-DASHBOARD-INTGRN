@@ -453,8 +453,24 @@ body {
 .page-boxed .page-header.navbar .top-menu .navbar-nav>li.dropdown-language .dropdown-toggle .langname, .page-boxed .page-header.navbar .top-menu .navbar-nav>li.dropdown-user .dropdown-toggle .username.username-hide-on-mobile {
 display:none
 }
+
+.form-horizontal
+{
+margin-top:30px;
+margin-bottom:30px;
+
+}
+
 }
 @media (min-width:992px) {
+	
+.form-horizontal
+{
+margin-top:30px;
+margin-bottom:30px;
+
+}	
+	
 .page-sidebar-closed.page-sidebar-closed-hide-logo .page-header.navbar .page-logo {
 padding:0;
 width:54px;
@@ -492,6 +508,14 @@ width:235px
 	cursor:pointer
 }
 @media (max-width:991px) {
+	
+.form-horizontal
+{
+margin-top:30px;
+margin-bottom:30px;
+
+}		
+	
 .page-header.navbar {
 padding:0;
 margin:0;
@@ -554,6 +578,16 @@ padding:0!important
 }
 }
 @media (min-width:768px) and (max-width:991px) {
+
+.form-horizontal
+{
+margin-top:30px;
+margin-bottom:30px;
+
+}	
+
+
+
 .page-boxed .page-header.navbar {
 margin:auto!important;
 padding:0
@@ -563,6 +597,14 @@ margin:auto!important
 }
 }
 @media (max-width:767px) {
+
+.form-horizontal
+{
+margin-top:30px;
+margin-bottom:30px;
+
+}	
+
 .page-header.navbar {
 padding:0
 }
@@ -674,16 +716,40 @@ left:auto
 	margin-bottom:20px!important
 }
 @media (min-width:1260px) {
+	
+.form-horizontal
+{
+margin-top:30px;
+margin-bottom:30px;
+
+}	
+	
 .container {
 width:1270px
 }
 }
 @media (min-width:992px) {
+	
+.form-horizontal
+{
+margin-top:30px;
+margin-bottom:30px;
+
+}	
+	
 .page-footer-fixed .page-container {
 margin-bottom:20px!important
 }
 }
 @media (max-width:991px) {
+
+.form-horizontal
+{
+margin-top:30px;
+margin-bottom:30px;
+
+}	
+	
 .page-container {
 margin:0!important;
 padding:10px 10px 0
@@ -693,6 +759,14 @@ margin-top:75px!important
 }
 }
 @media (max-width:767px) {
+
+.form-horizontal
+{
+margin-top:30px;
+margin-bottom:30px;
+
+}	
+	
 .page-container {
 margin:0!important;
 padding:0
@@ -711,6 +785,14 @@ display:none;
 
 }
 @media (max-width:480px) {
+	
+.form-horizontal
+{
+margin-top:30px;
+margin-bottom:30px;
+
+}
+	
 .page-header-fixed .pace .pace-progress {
 top:150px
 }
@@ -888,6 +970,13 @@ transition:all .2s ease
 	display:block
 }
 @media (min-width:992px) {
+
+.form-horizontal
+{
+margin-top:30px;
+margin-bottom:30px;
+}	
+	
 .page-sidebar, .page-sidebar .page-sidebar-menu {
 margin-bottom:0px
 }
@@ -1128,6 +1217,15 @@ padding-right:10px
 }
 }
 @media (max-width:991px) {
+	
+.form-horizontal
+{
+margin-top:30px;
+margin-bottom:30px;
+
+}	
+	
+	
 .page-sidebar .selected, .page-sidebar.navbar-collapse.collapse {
 display:none!important
 }
@@ -1155,6 +1253,14 @@ display:block
 }
 }
 @media (min-width:768px) and (max-width:991px) {
+
+.form-horizontal
+{
+margin-top:30px;
+margin-bottom:30px;
+
+}	
+	
 .page-sidebar .btn-navbar.collapsed .arrow {
 display:none
 }
@@ -1170,6 +1276,14 @@ border-right:15px solid transparent
 }
 }
 @media (max-width:767px) {
+	
+.form-horizontal
+{
+margin-top:30px;
+margin-bottom:30px;
+
+}
+	
 .page-sidebar, .page-sidebar.in {
 margin:10px!important
 }
@@ -1184,7 +1298,7 @@ margin-top:10px!important
 .page-head .page-title {
 	display:inline-block;
 	float:left;
-	padding:5px 0 10px
+	padding:10px 0 10px
 }
 .page-head .page-title>h1 {
 	color:#697882;
@@ -1228,6 +1342,14 @@ margin-top:10px!important
 	margin-left:0!important
 }
 @media (min-width:992px) {
+	
+.form-horizontal
+{
+margin-top:30px;
+margin-bottom:30px;
+
+}
+	
 .page-content-wrapper {
 float:left;
 width:100%
@@ -1269,6 +1391,14 @@ margin-right:0!important
 }
 }
 @media (max-width:991px) {
+	
+.form-horizontal
+{
+margin-top:30px;
+margin-bottom:30px;
+
+}	
+	
 .page-boxed>.container {
 width:100%;
 max-width:none!important;
@@ -1309,14 +1439,15 @@ clear:both
 .page-footer {
 	padding:10px 20px 15px;
 	font-size:13px;
-	height:33px
+	height:33px;
+	text-align:center;
 }
 .page-footer:after, .page-footer:before {
 	content:" ";
 	display:table
 }
 .page-footer .page-footer-inner {
-	float:left;
+	
 	display:inline-block
 }
 .page-footer .page-footer-tools {
@@ -1399,7 +1530,9 @@ right:10px
 @media (max-width:991px) {
 .page-footer {
 padding-left:10px;
-padding-right:10px
+padding-right:10px;
+border-top:1px solid #EEE;	
+clear:left;
 }
 }
 @media (max-width:767px) {
@@ -1921,4 +2054,29 @@ transition:display .3s;
 .page-on-load .page-container, .page-on-load .page-footer, .page-on-load .page-header, .page-on-load>.clearfix {
 	display:none;
 	transition:all 2s
+}
+
+
+hr
+{
+margin:10px 0;
+}
+
+h3
+{
+margin:10px 0;
+}
+
+#spacer
+{
+height:20px;
+width:1px;
+clear:both;
+
+}
+
+.btnspacer
+{
+margin-left:5px !important;
+margin-right:5px !important;
 }

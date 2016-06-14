@@ -31,11 +31,11 @@ import com.paas_gui.vpc.MarathonRest;
  */
 public class EnvironmentDAO {
 
-	private static final Logger LOG = LoggerFactory.getLogger(EnvironmentDAO.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(EnvironmentDAO.class);
 
-	private static final String INSERT_ENVIRONMENT_SERVICE_QUERY = "INSERT INTO environment_types VALUES(?,?,?,?,?,?,?)";
-	private static final String GET_ALL_ENVIRONMENT_QUERY = "SELECT * FROM environment_types";
-	private static final String DELETE_ENVIRONMENT_BY_NAME = "DELETE FROM environment_types WHERE name = ?";
+	private static final String INSERT_ENVIRONMENT_SERVICE_QUERY = "INSERT INTO  environments (environment_name,description,tenant_id, createdDTM) VALUES(?,?,?,now())";
+	private static final String GET_ALL_ENVIRONMENT_QUERY = "SELECT * FROM environments";
+	private static final String DELETE_ENVIRONMENT_BY_NAME = "DELETE FROM environments WHERE  environment_name = ?";
 	private static final String SELECT_ALL_ENVIRONMENTS_LIST = "SELECT * FROM envirnament";
 	private static final String SELECT_APPLICATION_SUMMARY_BY_APPLICATION_NAME = "SELECT applicantName FROM appsummary";
 	private static final String SELECT_IMAGE_REPOSITORY_FROM_APPLICANT_NAME = "SELECT imageRepository FROM appsummary WHERE applicantName=?";
@@ -54,29 +54,25 @@ public class EnvironmentDAO {
 	 * @throws DataBaseOperationFailedException
 	 *             : Unable to insert EnvironmentTypes
 	 */
-	public void insertEnvironmentType(EnvironmentType environmentTypes) throws DataBaseOperationFailedException {
-		LOG.debug(".insertEnvironmentType method of insertEnvironmentType");
+	public void insertEnvironmentType(EnvironmentType environmentType) throws DataBaseOperationFailedException {
+		LOGGER.debug(".insertEnvironmentType method of insertEnvironmentType");
 		DataBaseConnectionFactory dataBaseConnectionFactory = new DataBaseConnectionFactory();
 		Connection connection = null;
 		PreparedStatement pStatement = null;
 		try {
 			connection = dataBaseConnectionFactory.getConnection(MYSQL_DB);
 			pStatement = (PreparedStatement) connection.prepareStatement(INSERT_ENVIRONMENT_SERVICE_QUERY);
-			pStatement.setString(1, environmentTypes.getName());
-			pStatement.setString(2, environmentTypes.getDescription());
-			pStatement.setString(3, environmentTypes.getAcceptTag());
-			pStatement.setString(4, environmentTypes.getPromoteTag());
-			pStatement.setString(5, environmentTypes.getAction());
-			pStatement.setInt(6, environmentTypes.getRestartInterval());
-			pStatement.setInt(7, environmentTypes.getQuietPeriod());
+			pStatement.setString(1, environmentType.getName());
+			pStatement.setString(2, environmentType.getDescription());
+			pStatement.setInt(3, environmentType.getTenantId());
 
 			pStatement.executeUpdate();
-			LOG.debug("EnvironmentType Data is Updated");
+			LOGGER.debug("EnvironmentType Data is Updated");
 
 		} catch (ClassNotFoundException | IOException e) {
-			LOG.error("Unable to insert environment type into db with data: " + environmentTypes);
+			LOGGER.error("Unable to insert environment type into db with data: " + environmentType);
 			throw new DataBaseOperationFailedException(
-					"Unable to insert environment type into db with data : " + environmentTypes, e);
+					"Unable to insert environment type into db with data : " + environmentType, e);
 		
 		} catch(SQLException e) {
 			if(e.getErrorCode() == 1064) {
@@ -87,7 +83,7 @@ public class EnvironmentDAO {
 				throw new DataBaseOperationFailedException(message, e);
 			} else
 				throw new DataBaseOperationFailedException(
-						"Unable to insert environment type into db with data : " + environmentTypes, e);
+						"Unable to insert environment type into db with data : " + environmentType, e);
 		} finally {
 			DataBaseHelper.dbCleanUp(connection, pStatement);
 		}
@@ -103,7 +99,7 @@ public class EnvironmentDAO {
 
 	public List<EnvironmentType> getAllEnvironmentType() throws DataBaseOperationFailedException {
 
-		LOG.debug(".getAllEnvironmentType of EnvironmentDAO");
+		LOGGER.debug(".getAllEnvironmentType of EnvironmentDAO");
 		DataBaseConnectionFactory connectionFactory = new DataBaseConnectionFactory();
 		List<EnvironmentType> environmentTypesList = new LinkedList<EnvironmentType>();
 		Connection connection = null;
@@ -116,24 +112,19 @@ public class EnvironmentDAO {
 			resultSet = statement.executeQuery(GET_ALL_ENVIRONMENT_QUERY);
 			if (resultSet != null) {
 				while (resultSet.next()) {
+					
 					EnvironmentType environmentType = new EnvironmentType();
-					environmentType.setName(resultSet.getString("name"));
-					environmentType.setAction(resultSet.getString("description"));
-					environmentType.setAcceptTag(resultSet.getString("accept_tag"));
-					environmentType.setDescription(resultSet.getString("promote_tag"));
-					environmentType.setPromoteTag(resultSet.getString("action"));
-					environmentType.setQuietPeriod(resultSet.getInt("restart_interval"));
-					environmentType.setRestartInterval(resultSet.getInt("quiet_period"));
-
+					environmentType.setName(resultSet.getString("environment_name"));
+					environmentType.setDescription(resultSet.getString("description"));
 					environmentTypesList.add(environmentType);
 
 				}
 			} else {
-				LOG.debug("No data is available on environment");
+				LOGGER.debug("No data is available on environment");
 			}
 
 		} catch (ClassNotFoundException | IOException e) {
-			LOG.error("Unable to fetch environment into db ");
+			LOGGER.error("Unable to fetch environment into db ");
 			throw new DataBaseOperationFailedException("Unable to environment summary ", e);
 		} catch(SQLException e) {
 			if(e.getErrorCode() == 1064) {
@@ -160,7 +151,7 @@ public class EnvironmentDAO {
 	 */
 
 	public void deleteEnvironmentTypeByName(String name) throws DataBaseOperationFailedException {
-		LOG.debug(".deleteEnvironmentTypeByName of EnvironmentDAO");
+		LOGGER.debug(".deleteEnvironmentTypeByName of EnvironmentDAO");
 		DataBaseConnectionFactory connectionFactory = new DataBaseConnectionFactory();
 		Connection connection = null;
 		PreparedStatement preparedStatement = null;
@@ -170,8 +161,9 @@ public class EnvironmentDAO {
 			preparedStatement = (PreparedStatement) connection.prepareStatement(DELETE_ENVIRONMENT_BY_NAME);
 			preparedStatement.setString(1, name);
 			preparedStatement.executeUpdate();
+			LOGGER.debug("Environment deleted successfully with name "+name+"Successfully");
 		} catch (ClassNotFoundException | IOException e) {
-			LOG.error("Unable to delete environment from db ");
+			LOGGER.error("Unable to delete environment from db ");
 			throw new DataBaseOperationFailedException("Unable to delete environment from db ", e);
 		} catch(SQLException e) {
 			if(e.getErrorCode() == 1064) {
@@ -198,7 +190,7 @@ public class EnvironmentDAO {
 
 	public List<Environments> getAllEnvironmentsList() throws DataBaseOperationFailedException {
 
-		LOG.debug(".deleteEnvironmentTypeByName of EnvironmentDAO");
+		LOGGER.debug(".deleteEnvironmentTypeByName of EnvironmentDAO");
 		List<Environments> environmentsList = new ArrayList<Environments>();
 		DataBaseConnectionFactory connectionFactory = new DataBaseConnectionFactory();
 		Connection connection = null;
@@ -225,7 +217,7 @@ public class EnvironmentDAO {
 			}
 
 		} catch (ClassNotFoundException | IOException e) {
-			LOG.error("Unable to get environmentlist from db ");
+			LOGGER.error("Unable to get environmentlist from db ");
 			throw new DataBaseOperationFailedException("Unable to get environmentlist from db ", e);
 		} catch(SQLException e) {
 			if(e.getErrorCode() == 1064) {
@@ -270,7 +262,7 @@ public class EnvironmentDAO {
 				applicantSummaryList.add(applicantSummary);
 			}
 		} catch (ClassNotFoundException | IOException e) {
-			LOG.error("Unable to get application summary from db ");
+			LOGGER.error("Unable to get application summary from db ");
 			throw new DataBaseOperationFailedException("Unable to get application summary from db  ", e);
 		} catch(SQLException e) {
 			if(e.getErrorCode() == 1064) {
@@ -300,7 +292,7 @@ public class EnvironmentDAO {
 	public ApplicantSummary selectImageRepositoryFromRepositoryName(String repoName)
 			throws DataBaseOperationFailedException {
 
-		LOG.debug(".selectImageRepositoryFromRepositoryName of EnvironmentDAO");
+		LOGGER.debug(".selectImageRepositoryFromRepositoryName of EnvironmentDAO");
 		DataBaseConnectionFactory connectionFactory = new DataBaseConnectionFactory();
 		Connection connection = null;
 		PreparedStatement preparedStatement = null;
@@ -318,7 +310,7 @@ public class EnvironmentDAO {
 				applicantSummary.setImageRepository(resultSet.getString("imageRepository"));
 			}
 		} catch (ClassNotFoundException | IOException e) {
-			LOG.error("Unable to get select image regesitory from summary from db ");
+			LOGGER.error("Unable to get select image regesitory from summary from db ");
 			throw new DataBaseOperationFailedException("Unable to get select image regesitory from summary from db  ",
 					e);
 		} catch(SQLException e) {
@@ -349,7 +341,7 @@ public class EnvironmentDAO {
 
 	public boolean insertAllEnvironmentsData(Environments environments) throws DataBaseOperationFailedException {
 
-		LOG.debug(".insertAllEnvironmentsData of EnvironmentDAO");
+		LOGGER.debug(".insertAllEnvironmentsData of EnvironmentDAO");
 		DataBaseConnectionFactory connectionFactory = new DataBaseConnectionFactory();
 		Connection connection = null;
 		PreparedStatement preparedStatement = null;
@@ -365,7 +357,7 @@ public class EnvironmentDAO {
 			preparedStatement.setString(6, environments.getState());
 			preparedStatement.executeUpdate();
 		} catch (ClassNotFoundException | IOException e) {
-			LOG.error("Unable to insert environment data into db: " + environments);
+			LOGGER.error("Unable to insert environment data into db: " + environments);
 			throw new DataBaseOperationFailedException("Unable to insert environment data into db  " + environments, e);
 		} catch(SQLException e) {
 			if(e.getErrorCode() == 1064) {

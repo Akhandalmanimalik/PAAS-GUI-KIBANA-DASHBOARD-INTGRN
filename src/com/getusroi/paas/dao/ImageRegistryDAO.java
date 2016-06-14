@@ -27,9 +27,11 @@ import static com.getusroi.paas.helper.PAASConstant.*;
 public class ImageRegistryDAO {
 	 static final Logger logger = LoggerFactory.getLogger(ImageRegistryDAO.class);
 	 private final String INSERT_IMAGEREGISTRY_QUERY="insert into image_registry (registory_name,registory_url,version,user_name,password,tenant_id,createDTM) VALUES (?,?,?,?,?,?,NOW())";
-	 private final String GET_ALL_IMAGEREGISTRY_QUERY="select * from image_registry";
-	 private final String GET_IMAGE_REGISTRY_BY_NAME="select * from image_registry where name=?";
-	 private final String DELETE_IMAGEREGISTRY_BY_IMAGENAME_AND_USERNAME_QUERY="delete from image_registry where name=? AND user_name=?";
+	 private final String GET_ALL_IMAGEREGISTRY_QUERY="select * from image_registry where tenant_id=?";
+	 private final String GET_IMAGE_REGISTRY_BY_NAME_AND_TENANT_ID="select * from image_registry where registory_name=? and tenant_id=?";
+	 private final String DELETE_IMAGEREGISTRY_BY_IMAGENAME_AND_USERNAME_QUERY="delete from image_registry where registory_name=? AND user_name=?";
+	 private final String GET_IMAGE_REGISTRY_ID_BY_NAME = "select id from image_registry where registory_name=?";
+	 
 	 /**
 	  * This method is used to store imageRegistry in db
 	  * @param imageRegistryVO : ImageRegistryVO 
@@ -77,17 +79,18 @@ public class ImageRegistryDAO {
 	 * @return List<ImageRegistryVO> : List of all image registry from db
 	 * @throws DataBaseOperationFailedException : unable to fetch image regsitry from db
 	 */
-	public List<ImageRegistry> getAllImageRegistry() throws DataBaseOperationFailedException{
+	public List<ImageRegistry> getAllImageRegistry(int tenantId) throws DataBaseOperationFailedException{
 		logger.debug(".getAllImageRegistry method of ImageRegistryDAO");
 		Connection connection=null;
-		Statement stmt=null;
+		PreparedStatement stmt=null;
 		ResultSet result=null;
 		List<ImageRegistry> imageRegistryList=new ArrayList<>();
 		DataBaseConnectionFactory connectionFactory=new DataBaseConnectionFactory();
 		try {
 			connection=connectionFactory.getConnection(MYSQL_DB);
-			stmt=connection.createStatement();
-			result=stmt.executeQuery(GET_ALL_IMAGEREGISTRY_QUERY);
+			stmt = (PreparedStatement) connection.prepareStatement(GET_ALL_IMAGEREGISTRY_QUERY);
+			stmt.setInt(1, tenantId);
+			result=stmt.executeQuery();
 			if(result !=null){
 				while(result.next()){
 					String name=result.getString("registory_name");
@@ -130,7 +133,7 @@ public class ImageRegistryDAO {
 	 * @return ImageRegistry : image registry from db based on name
 	 * @throws DataBaseOperationFailedException : unable to fetch image regsitry from db
 	 */
-	public ImageRegistry getImageRegistryByName(String imageRegistryName) throws DataBaseOperationFailedException{
+	public ImageRegistry getImageRegistryByName(String imageRegistryName,int id) throws DataBaseOperationFailedException{
 		logger.debug(".getAllImageRegistry method of ImageRegistryDAO");
 		
 		Connection connection=null;
@@ -140,21 +143,21 @@ public class ImageRegistryDAO {
 		DataBaseConnectionFactory connectionFactory=new DataBaseConnectionFactory();
 		try {
 			connection=connectionFactory.getConnection(MYSQL_DB);
-			pstmt=connection.prepareStatement(GET_IMAGE_REGISTRY_BY_NAME);
-			pstmt.setString(1,imageRegistryName);			
+			pstmt=connection.prepareStatement(GET_IMAGE_REGISTRY_BY_NAME_AND_TENANT_ID);
+			pstmt.setString(1,imageRegistryName);
+			pstmt.setInt(2, id);
 			result=pstmt.executeQuery();
 			if(result !=null){
 				while(result.next()){
-					String name = result.getString("name");
-					String location = result.getString("location");
-					String version = result.getString("version");
-					String private_cloud = result.getString("private_cloud");
+					String name = result.getString("registory_name");
+					String location = result.getString("registory_url");
+					 
+					
 					String user_name = result.getString("user_name");
 					String password = result.getString("password");
-					int tenant_id = result.getInt("tenant_id");
+					 
 					
-					logger.debug("name : "+name+", location : "+location+", version : "+version+", private cloud : "+private_cloud+", user name : "+user_name+", password : "+password);
-					 imageRegistry=new ImageRegistry(name, location, version, user_name, password,tenant_id);
+					 imageRegistry=new ImageRegistry(name, location, "", user_name, password,7);
 					
 				}//end of while
 				logger.debug("element in image registry list are : "+imageRegistry);
@@ -212,5 +215,51 @@ public class ImageRegistryDAO {
 			DataBaseHelper.dbCleanUp(connection, pstmt);			
 		}
 	}//end of method
+	
+	/**
+	 * This method is used to get  image registry from db by name
+	 * @param imageRegistryName : image registry name in String
+	 * @return ImageRegistry : image registry from db based on name
+	 * @throws DataBaseOperationFailedException : unable to fetch image regsitry from db
+	 */
+	public Integer getImageRegistryIdByName(String imageRegistryName) throws DataBaseOperationFailedException{
+		logger.debug(".getImageRegistryIdByName method of ImageRegistryDAO");
+		
+		Connection connection=null;
+		java.sql.PreparedStatement pstmt=null;
+		ResultSet result=null;
+		DataBaseConnectionFactory connectionFactory=new DataBaseConnectionFactory();
+		Integer imageRegistryId=null;
+		try {
+			connection=connectionFactory.getConnection(MYSQL_DB);
+			pstmt=connection.prepareStatement(GET_IMAGE_REGISTRY_ID_BY_NAME);
+			pstmt.setString(1,imageRegistryName);
+			result=pstmt.executeQuery();
+			if(result !=null){
+				while(result.next()){
+					imageRegistryId = result.getInt("id");
+				}//end of while
+				logger.debug("Image id with given image Registry : "+imageRegistryId);
+			}else{
+				logger.debug("No data available in image_registry table");
+			}
+		} catch (ClassNotFoundException | IOException e) {
+			logger.error("Unable to fetch the data from image_registry");
+			throw new DataBaseOperationFailedException("Error in getting all data from image_registry ",e);
+		}catch(SQLException e) {
+			if(e.getErrorCode() == 1064) {
+				String message = "Error in getting all data from image_registry: " + PAASErrorCodeExceptionHelper.exceptionFormat(PAASConstant.ERROR_IN_SQL_SYNTAX);
+				throw new DataBaseOperationFailedException(message, e);
+			} else if(e.getErrorCode() == 1146) {
+				String message = "Error in getting all data from image_registry because: " + PAASErrorCodeExceptionHelper.exceptionFormat(PAASConstant.TABLE_NOT_EXIST);
+				throw new DataBaseOperationFailedException(message, e);
+			} else
+				throw new DataBaseOperationFailedException("Error in getting all data from image_registry ",e);
+		} finally{
+			DataBaseHelper.dbCleanup(connection, pstmt, result);
+		}
+		return imageRegistryId;
+	}//end of method getAllImageRegistry
+	
 
 }

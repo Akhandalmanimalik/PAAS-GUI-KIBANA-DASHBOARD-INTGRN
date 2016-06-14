@@ -22,7 +22,7 @@ import com.getusroi.paas.db.helper.DataBaseConnectionFactory;
 import com.getusroi.paas.db.helper.DataBaseHelper;
 import com.getusroi.paas.helper.PAASConstant;
 import com.getusroi.paas.helper.PAASErrorCodeExceptionHelper;
-import com.getusroi.paas.vo.AddService;
+import com.getusroi.paas.vo.Service;
 import com.getusroi.paas.vo.ApplicantSummary;
 import com.getusroi.paas.vo.EnvironmentVariable;
 import com.getusroi.paas.vo.Route;
@@ -34,13 +34,13 @@ public class ApplicationDAO {
 
 	public static final String INSERT_APPLICATION_SUMMARY_QUERY = "insert into appsummary values(?,?,?,?,?)";
 	public static final String GET_ALL_APPLICATION_SUMMARY_QUERY = "select * from appsummary";
-	public static final String INSERT_APPLICATION_SERVICE_QUERY = "insert into addService values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+	public static final String INSERT_APPLICATION_SERVICE_QUERY = "insert into application (service_name,registry_url,tag,run,host_name,host_port,container_port,protocol_type,port_index,path,interval_seconds,timeout_seconds,max_consecutive_failures,grace_period_seconds,ignore_http1xx,instance_count,host_path,container_path,volume,subnet_id,createdDTM,tenant_id,registry_id,container_id) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),?,?,?)";
 	public static final String GET_ALL_APPLICATION_SERVICE_BY_USER_ID_QUERY = "select * from addService where user_id=?";
 	public static final String DELET_SERVICE_BY_SERVICENAME_AND_USER_ID_QUERY = "delete from addService where serviceName=? and user_id=?";
 	public static final String GET_ENVIRONMENT_VARIABLE_BY_SERVICENAME = "select * from environment_variable where serviceName =?";
 	public static final String GET_ROUTE_BY_SERVICENAME = "select * from route where serviceName =?";
 	public static final String GET_NETWORK_POLICY_BY_SERVICENAME = "select * from network_policy where serviceName =?";
-	public static final String GET_SERVICE_BY_NAME_AND_USERID = "select * from addService where serviceName=? && user_id=?";
+	public static final String GET_SERVICE_BY_NAME_AND_USERID = "select * from application where service_name=? && tenant_id=?";
 
 	/**
 	 * This method is used to add application summary
@@ -165,7 +165,7 @@ public class ApplicationDAO {
 	 * @throws DataBaseOperationFailedException
 	 *             : Error in adding service to db
 	 */
-	public void addService(AddService addService)
+	public void addService(Service service)
 			throws DataBaseOperationFailedException {
 		logger.debug(".addService method of ApplicationDAO");
 		DataBaseConnectionFactory connectionFactory = new DataBaseConnectionFactory();
@@ -174,37 +174,47 @@ public class ApplicationDAO {
 		try {
 			connection = connectionFactory.getConnection(MYSQL_DB);
 
-		if(checkServiceNameExist(connection, addService))
-		throw new DataBaseOperationFailedException("given service name exit so Unable to insert data for service into db with data :  "+ addService);
-			
+		if(checkServiceNameExist(connection, service))
+		throw new DataBaseOperationFailedException("given service name exit so Unable to insert data for service into db with data :  "+ service);
 			pstmt = (PreparedStatement) connection
 					.prepareStatement(INSERT_APPLICATION_SERVICE_QUERY);
-			pstmt.setString(1, addService.getServiceName());
-			pstmt.setString(2, addService.getType());
-			pstmt.setString(3, addService.getApplicantionName());
-			pstmt.setString(4, addService.getImageRegistry());
-			pstmt.setString(5, addService.getImageRepository());
-			pstmt.setString(6, addService.getTag());
-			pstmt.setString(7, addService.getRun());
-			pstmt.setString(8, addService.getHostname());
-			pstmt.setString(9, addService.getTypename());
-			pstmt.setString(10, addService.getEnvirnament());
-			pstmt.setString(11, addService.getEnvpath());
-			pstmt.setString(12, addService.getEnvinterval());
-			pstmt.setString(13, addService.getEnvtimeout());
-			pstmt.setString(14, addService.getEnvthresold());
-			pstmt.setString(15, addService.getEnvignore());
-			pstmt.setString(16, addService.getVolume());
-			pstmt.setInt(17, addService.getUserId());
+			
+			pstmt.setString(1, service.getServiceName());
+			pstmt.setString(2, service.getImageRepository());
+			pstmt.setString(3, service.getTag());
+			pstmt.setString(4, service.getRun());
+			pstmt.setString(5, service.getHostName());
+			pstmt.setInt(6, service.getHostPort());
+			pstmt.setInt(7, service.getContainerPort());
+			pstmt.setString(8, service.getProtocal());		//HARDCODE
+			pstmt.setInt(9, 111);							//HARDCODE
+			pstmt.setString(10, service.getEnvPath());	
+			pstmt.setInt(11, service.getEnvInterval());
+			pstmt.setInt(12, 60);							//HARDCODE
+			pstmt.setInt(13, service.getEnvThreshold());
+			pstmt.setInt(14, 120);							//HARDCODE
+			pstmt.setInt(15, service.getEnvIgnore());
+			pstmt.setInt(16, 11);							//HARDCODE
+			pstmt.setString(17, "hostpath1");				//HARDCODE
+			pstmt.setString(18, "contnrpath1");				//HARDCODE	
+			pstmt.setInt(19, service.getVolume());
+			
+//			pstmt.setInt(20, new SubnetDAO().getSubnetIdBySubnetName(service.getSubnetName()));
+			pstmt.setInt(20, new SubnetDAO().getSubnetIdBySubnetName("subnetname1"));
+			
+			pstmt.setInt(21, service.getTenantId());
+			pstmt.setInt(22, new ImageRegistryDAO().getImageRegistryIdByName(service.getImageRegistry()));
+			pstmt.setInt(23, new ContainerTypesDAO().getContainerTypeIdByContainerName(service.getType()));
+			
 			pstmt.executeUpdate();
 		} catch (ClassNotFoundException | IOException e) {
 			e.printStackTrace();
 			logger.error(
 					"Unable to insert data for service into db with data : "
-							+ addService, e);
+							+ service, e);
 			throw new DataBaseOperationFailedException(
 					"Unable to insert data for service into db with data :  "
-							+ addService, e);
+							+ service, e);
 		} catch (SQLException e) {
 			e.printStackTrace();
 			if (e.getErrorCode() == 1064) {
@@ -220,7 +230,7 @@ public class ApplicationDAO {
 			} else
 				throw new DataBaseOperationFailedException(
 						"Unable to insert data for service into db with data :  "
-								+ addService, e);
+								+ service, e);
 		} finally {
 			DataBaseHelper.dbCleanUp(connection, pstmt);
 		}
@@ -233,11 +243,11 @@ public class ApplicationDAO {
 	 * @throws DataBaseOperationFailedException
 	 *             : Unable to get the all service from db
 	 */
-	public List<AddService> getAllServiceByUserId(int user_id)
+	public List<Service> getAllServiceByUserId(int user_id)
 			throws DataBaseOperationFailedException {
 		logger.debug(".getAllService method of ApplicationDAO");
 		DataBaseConnectionFactory connectionFactory = new DataBaseConnectionFactory();
-		List<AddService> addServiceList = new LinkedList<AddService>();
+		List<Service> addServiceList = new LinkedList<Service>();
 		Connection connection = null;
 		PreparedStatement pstmt = null;
 		ResultSet result = null;
@@ -249,7 +259,7 @@ public class ApplicationDAO {
 			result = pstmt.executeQuery();
 			if (result != null) {
 				while (result.next()) {
-					AddService addService = new AddService();
+					Service addService = new Service();
 					addService.setServiceName(result.getString("serviceName"));
 					addService.setType(result.getString("type"));
 					addService.setApplicantionName(result
@@ -260,14 +270,14 @@ public class ApplicationDAO {
 							.getString("imageRepository"));
 					addService.setTag(result.getString("tag"));
 					addService.setRun(result.getString("run"));
-					addService.setHostname(result.getString("hostname"));
-					addService.setTypename(result.getString("typename"));
+					addService.setHostName(result.getString("hostname"));
+					addService.setTypeName(result.getString("typename"));
 					addService.setEnvirnament(result.getString("envirnament"));
-					addService.setEnvpath(result.getString("envpath"));
-					addService.setEnvinterval(result.getString("envinterval"));
+					addService.setEnvPath(result.getString("envpath"));
+					addService.setEnvInterval(result.getInt("envinterval"));
 					addService.setEnvtimeout(result.getString("envtimeout"));
-					addService.setEnvthresold(result.getString("envthresold"));
-					addService.setEnvignore(result.getString("envignore"));
+					addService.setEnvThreshold(result.getInt("envthresold"));
+					addService.setEnvIgnore(result.getInt("envignore"));
 					List<EnvironmentVariable> listOfEnvs = getAllEnvironment(
 							connection, result.getString("serviceName"));
 					List<Route> listOfRoute = getRouteByServiceName(connection,
@@ -513,7 +523,7 @@ public class ApplicationDAO {
 	 * @throws SQLException
 	 */
 	private boolean checkServiceNameExist(Connection connection,
-			AddService addService) throws DataBaseOperationFailedException,
+			Service addService) throws DataBaseOperationFailedException,
 			SQLException {
 		logger.debug(".checkServiceNameExist  method of ApplicationDAO with Service Deatsil : "+ addService);
 		boolean isServiceExist = false;
@@ -525,19 +535,22 @@ public class ApplicationDAO {
 			statement = connection
 					.prepareStatement(GET_SERVICE_BY_NAME_AND_USERID);
 			statement.setString(1, addService.getServiceName());
-			statement.setInt(2, addService.getUserId());
+			statement.setInt(2, addService.getTenantId());
 			reSet = statement.executeQuery();
-			while (reSet.next()) {
-				isServiceExist = true;
+			if(reSet != null){
+				while (reSet.next()) {
+					isServiceExist = true;
+				}
 			}
 		} catch (SQLException e) {
 			logger.error("Unable to fetch   service:"
 					+ addService.getServiceName() + "   from db with user_id="
-					+ addService.getUserId());
+					+ addService.getTenantId());
 			throw new DataBaseOperationFailedException(
 					"Unable to fetch   service" + addService.getServiceName()
 							+ " from db", e);
 		} finally {
+			if(reSet != null)
 			reSet.close();
 			statement.close();
 		}

@@ -3,14 +3,16 @@ package com.getusroi.paas.vo;
 public class VPC {
 	private String vpcId;
 	private String vpc_name;
-	private String vpc_region;
-	private String cidr;
+	 
 	private String acl;
-	public VPC(String vpcId, String vpc_name, String vpc_region, String cidr,String acl) {
+	private int tenant_id;
+	public VPC() {
+		// TODO Auto-generated constructor stub
+	}
+	public VPC(String vpcId, String vpc_name,  String acl) {
 		this.vpcId = vpcId;
 		this.vpc_name = vpc_name;
-		this.vpc_region = vpc_region;
-		this.cidr = cidr;
+		 
 		this.acl = acl;
 	}
 	public String getVpcId() {
@@ -25,30 +27,26 @@ public class VPC {
 	public void setVpc_name(String vpc_name) {
 		this.vpc_name = vpc_name;
 	}
-	public String getVpc_region() {
-		return vpc_region;
-	}
-	public void setVpc_region(String vpc_region) {
-		this.vpc_region = vpc_region;
-	}
-	public String getCidr() {
-		return cidr;
-	}
-	public void setCidr(String cidr) {
-		this.cidr = cidr;
-	}
+	 
 	public String getAcl() {
 		return acl;
 	}
 	public void setAcl(String acl) {
 		this.acl = acl;
 	}
+	  
+	
+	public int getTenant_id() {
+		return tenant_id;
+	}
+	public void setTenant_id(int tenant_id) {
+		this.tenant_id = tenant_id;
+	}
+	
 	@Override
 	public String toString() {
 		return "VPC [vpcId=" + vpcId + ", vpc_name=" + vpc_name
-				+ ", vpc_region=" + vpc_region + ", cidr=" + cidr + ", acl="
-				+ acl + "]";
+				+   ", acl="
+				+ acl + ", tenant_id=" + tenant_id + "]";
 	}
-	
-		
 }

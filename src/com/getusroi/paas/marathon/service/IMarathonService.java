@@ -1,6 +1,6 @@
 package com.getusroi.paas.marathon.service;
 
-import com.getusroi.paas.vo.AddService;
+import com.getusroi.paas.vo.Service;
 
 
 
@@ -10,6 +10,6 @@ public interface IMarathonService {
 	public void updateMarathonInsance(String data) throws MarathonServiceException;
 	public String getDockerContainerID() throws MarathonServiceException;
 	public String  getGatewayRoute() throws MarathonServiceException;
-	public String postRequestToMarathon(AddService addService) throws MarathonServiceException;
-	public void  attachNasStorage(AddService addService,String  containerdisk) throws MarathonServiceException;
+	public String postRequestToMarathon(Service addService) throws MarathonServiceException;
+	public void  attachNasStorage(Service addService,String  containerdisk) throws MarathonServiceException;
 }

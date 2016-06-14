@@ -13,7 +13,7 @@ public class RestServiceHelper {
 	 * @return
 	 */
 	public Integer convertStringToInteger(String inputString) {
-		LOGGER.info("Inside convertStringToInteger (.) of RestServiceHelper ");
+		LOGGER.info("Inside convertStringToInteger (.) of RestServiceHelper "+inputString);
 		Integer result = null;
 		if(inputString != null && !inputString.equalsIgnoreCase("")){
 			try{

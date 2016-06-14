@@ -28,15 +28,15 @@ import com.mysql.jdbc.PreparedStatement;
  *
  */
 public class NetworkDAO {
-	 static final Logger logger = LoggerFactory.getLogger(NetworkDAO.class);
-	 private final String REGISTER_VPC_QUERY="insert into vpc values(?,?,?,?,?)";
+	 static final Logger logger = LoggerFactory.getLogger(SubnetDAO.class);
+	 private final String REGISTER_VPC_QUERY="insert into vpc(vpc_name,tenant_id,createdDTM,acl) values(?,?,NOW(),?)";
 	 private final String GET_VPCID_BY_VPCNAME_QUERY="select vpcId from vpc where vpc_name=?";
 	 private final String GET_ALL_VPC_QUERY="select * from vpc";
 	 private final String DELETE_VPC_BY_NAME_QUERY="delete from vpc where vpc_name=?";
 	 private final String UPDATE_VPC_BY_NAME_AND_VPCID_QUERY="update vpc set vpc_region=? , cidr=?, acl=? where vpcId=? AND vpc_name=?";
-	 private final String INSERT_ACL_QUERY="insert into acl (acl_name,source_ip,destination_ip,tenant_id,subnet_id,createdDTM) values(?,?,?,?,?,NOW())";
+	 private final String INSERT_ACL_QUERY="insert into acl (acl_name,source_ip,destination_ip,action,port,tenant_id,createdDTM) values(?,?,?,?,?,?,NOW())";
 	 private final String GEL_ALL_ACL_NAMES_QUERY="select aclname from acl";
-	 private final String GEL_ALL_ACL_QUERY="select * from acl";
+	 private final String GEL_ALL_ACL_QUERY="select * from acl where tenant_id=?";
 	 private final String UPDATE_ACL_BY_NAME_QUERY="update acl set action=?, sourceip=?, destip=? where name=?";
 	 private final String INSERT_VPC_REGION_QUERY="insert into vpc_region (region) values(?)";
 	 private final String GET_VPC_REGION_NAME_QUERY="select region from vpc_region";
@@ -45,7 +45,8 @@ public class NetworkDAO {
 	 private final String GET_ALL_SUBNET_BY_USER_ID_QUERY="select * from subnet where user_id=?";
 	 private final String DELETE_SUBNET_BY_SUBNET_NAME_QUERY="delete from subnet where subnet_name=?";
 	 private final String UPDATE_SUBNET_BY_SUBNETID_AND_SUBNETNAME_QUERY="update subnet set vpc_name =? , cidr=?, acl=?, vpcId=? where subnetId=? AND subnet_name=?";
-
+	 private final String DELETE_ACL_BY_NAME_QUERY_Using_TenantId = "delete from acl where acl_name=? and tenant_id=?";
+	 
 	/**
 	 * This method is used to add VPC to database
 	 * @param vpc : VPC object containg data need to be stored
@@ -60,10 +61,9 @@ public class NetworkDAO {
 			connection=connectionFactory.getConnection("mysql");
 			pstmt=(PreparedStatement) connection.prepareStatement(REGISTER_VPC_QUERY);
 			pstmt.setString(1, vpc.getVpc_name());
-			pstmt.setString(2, vpc.getVpc_region());
-			pstmt.setString(3, vpc.getCidr());
-			pstmt.setString(4, vpc.getAcl());
-			pstmt.setString(5, vpc.getVpcId());
+			pstmt.setInt(2, vpc.getTenant_id());
+			pstmt.setString(3, vpc.getAcl());
+			
 			pstmt.executeUpdate();
 			logger.debug("VPC registerd successfully with data : "+vpc);
 		} catch (ClassNotFoundException | IOException e) {
@@ -147,12 +147,10 @@ public class NetworkDAO {
 			if(result !=null){
 				while(result.next()){
 					String vpc_name=result.getString("vpc_name");
-					String vpc_region=result.getString("vpc_region");
-					String cidr=result.getString("cidr");
 					String acl=result.getString("acl");
-					String vpcId=result.getString("vpcId");
-					logger.debug("vpc name : "+vpc_name+", vpc region : "+vpc_region+", cidr : "+cidr+", acl : "+acl+", vpcId : "+vpcId);
-					VPC vpc=new VPC(vpcId, vpc_name, vpc_region, cidr, acl);
+					String vpcId=result.getString("vpc_id");
+					logger.debug("vpc name : "+vpc_name+", acl : "+acl+", vpcId : "+vpcId);
+					VPC vpc = new VPC(vpcId, vpc_name, acl);
 					vpcList.add(vpc);
 				}
 			}else{
@@ -189,6 +187,7 @@ public class NetworkDAO {
 		try {
 			connection=connectionFactory.getConnection("mysql");
 			pstmt=(PreparedStatement) connection.prepareStatement(DELETE_VPC_BY_NAME_QUERY);
+			pstmt.setString(1, vpcName);
 			pstmt.executeUpdate();
 			logger.debug("vpc : "+vpcName+" deleted from db successfully");
 		} catch (ClassNotFoundException | IOException e) {
@@ -221,8 +220,7 @@ public class NetworkDAO {
 		try {
 			connection=connectionFactory.getConnection("mysql");
 			pstmt=(PreparedStatement) connection.prepareStatement(UPDATE_VPC_BY_NAME_AND_VPCID_QUERY);
-			pstmt.setString(1,vpc.getVpc_region());
-			pstmt.setString(2,vpc.getCidr());
+			
 			pstmt.setString(3, vpc.getAcl());
 			pstmt.setString(4,vpc.getVpcId());
 			pstmt.setString(5,vpc.getVpc_name());
@@ -256,13 +254,14 @@ public class NetworkDAO {
 		PreparedStatement pstmt=null;
 		try {
 			connection=connectionFactory.getConnection("mysql");
-//			"insert into acl (acl_name,source_ip,destination_ip,tenant_id,subnet_id,createdDTM) values(?,?,?,?,?,NOW())";
 			pstmt=(PreparedStatement) connection.prepareStatement(INSERT_ACL_QUERY);
 			pstmt.setString(1,acl.getAclName());
-			pstmt.setString(2,acl.getSrcIp());
-			pstmt.setString(3,acl.getDestIP());
-			pstmt.setInt(4, acl.getTenant_id());
-			pstmt.setInt(5, acl.getSubnet_id());
+			pstmt.setString(2,acl.getSourceIp());
+			pstmt.setString(3,acl.getDestinationIp());
+			pstmt.setString(4,acl.getAction());
+			pstmt.setInt(5,acl.getPort());
+			pstmt.setInt(6,acl.getTenantId());
+			 
 			pstmt.executeUpdate();
 			logger.debug("ACL with data : "+acl+" executed successfully");
 		} catch (ClassNotFoundException | IOException e) {
@@ -298,7 +297,7 @@ public class NetworkDAO {
 			result=stmt.executeQuery(GEL_ALL_ACL_NAMES_QUERY);
 			if(result !=null){
 				while(result.next()){				
-					String aclname=result.getString("aclname");
+					String aclname=result.getString("acl_name");
 					logger.debug("acl name : "+aclname);					
 					aclList.add(aclname);
 				}
@@ -326,28 +325,31 @@ public class NetworkDAO {
 	 * @return List<ACL> : list of all ACL object conating acl data
 	 * @throws DataBaseOperationFailedException : Error in fetching data  for acl in db
 	 */
-	public List<ACL> getAllACL() throws DataBaseOperationFailedException{
+	public List<ACL> getAllACL(int tenantId) throws DataBaseOperationFailedException{
 		logger.debug(".getAllACL method of NetworkDAO");
 		DataBaseConnectionFactory connectionFactory=new DataBaseConnectionFactory();
 		List<ACL> aclList=new ArrayList<>();
 		Connection connection=null;
-		Statement stmt=null;
+		PreparedStatement pstmt=null;
 		ResultSet result=null;
 		try {
 			connection=connectionFactory.getConnection("mysql");
-			stmt=connection.createStatement();
-			result=stmt.executeQuery(GEL_ALL_ACL_QUERY);
+			pstmt=(PreparedStatement) connection.prepareStatement(GEL_ALL_ACL_QUERY);
+			
+			pstmt.setInt(1, tenantId);
+			
+			
+			result = pstmt.executeQuery();
 			if(result !=null){
 				while(result.next()){
 					
-					String sourceip=result.getString("sourceip");
-					String destip=result.getString("destip");
-					String aclname=result.getString("aclname");
-					//HARDCODE VAL
-					int tenant_id=0;
-					int subnet_id=0;
-					logger.debug("source ip: "+sourceip+", destination ip : "+destip+", acl name : "+aclname);
-					ACL acl= new ACL(sourceip, destip,aclname,tenant_id,subnet_id);
+					ACL acl = new ACL();
+					acl.setAclName(result.getString("acl_name"));
+					acl.setSourceIp(result.getString("source_ip"));
+					acl.setDestinationIp(result.getString("destination_ip"));
+					acl.setAction(result.getString("action"));
+					acl.setPort(result.getInt("port"));
+  
 					aclList.add(acl);
 				}
 			}else{
@@ -383,8 +385,8 @@ public class NetworkDAO {
 			connection=connectionFactory.getConnection("mysql");
 			pstmt=(PreparedStatement) connection.prepareStatement(UPDATE_ACL_BY_NAME_QUERY);
 			
-			pstmt.setString(2, acl.getSrcIp());
-			pstmt.setString(3, acl.getDestIP());
+//			pstmt.setString(2, acl.getSrcIp());
+//			pstmt.setString(3, acl.getDestIP());
 			pstmt.setString(5, acl.getAclName());
 			logger.debug("ACL update successfully with data : "+acl);
 		} catch (ClassNotFoundException | IOException e) {
@@ -672,5 +674,49 @@ public class NetworkDAO {
 		}
 
 	}//end of method updateSubnetBySubnetIDAndSubnetName
+	
+	/*
+	 * This method is to delete acl using aclname and tenantid
+	 */
+	public void deleteACLByName(String aclName,int id)
+			throws DataBaseOperationFailedException {
+		logger.debug(".deleating acl method of NetworkDAO");
+		DataBaseConnectionFactory connectionFactory = new DataBaseConnectionFactory();
+		Connection connection = null;
+		PreparedStatement pstmt = null;
+		try {
+			connection = connectionFactory.getConnection("mysql");
+			pstmt = (PreparedStatement) connection
+					.prepareStatement(DELETE_ACL_BY_NAME_QUERY_Using_TenantId);
+			pstmt.setString(1,aclName);
+			pstmt.setInt(2,id);
+			
+			pstmt.executeUpdate();
+			logger.debug("acl : " + aclName + " deleted from db successfully");
+		} catch (ClassNotFoundException | IOException e) {
+			logger.error("Error in deleting the acl from table using acl name : "
+					+ aclName);
+			throw new DataBaseOperationFailedException(
+					"Error in deleting the acl from table using acl name : "
+							+ aclName, e);
+		} catch (SQLException e) {
+			if (e.getErrorCode() == 1064) {
+				String message = "Error in deleting the acl from table using acl name because "
+						+ PAASErrorCodeExceptionHelper
+								.exceptionFormat(PAASConstant.ERROR_IN_SQL_SYNTAX);
+				throw new DataBaseOperationFailedException(message, e);
+			} else if (e.getErrorCode() == 1146) {
+				String message = "Error in deleting the acl from table using acl name because: "
+						+ PAASErrorCodeExceptionHelper
+								.exceptionFormat(PAASConstant.TABLE_NOT_EXIST);
+				throw new DataBaseOperationFailedException(message, e);
+			} else
+				throw new DataBaseOperationFailedException(
+						"Error in deleting the acl from table using acl name : "
+								+ aclName, e);
+		} finally {
+			DataBaseHelper.dbCleanUp(connection, pstmt);
+		}
+	}
 	
 }

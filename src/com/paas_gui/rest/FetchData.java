@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -18,6 +20,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -31,6 +34,7 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.json.JSONObject;
 
+import com.getusroi.paas.rest.RestServiceHelper;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -677,16 +681,22 @@ System.out.println("node "+josArray );
 	@POST
 	@Path("/storeApplicantUser")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response storeApplicantUser(String msg) throws JSONException {
-		LOGGER.info("-----------storeApplicantUser...-----------------");
+	public Response storeApplicantUser(String msg,@Context HttpServletRequest req) throws JSONException {
+		LOGGER.info("-----------storeApplicantUserss...-----------------");
 		ObjectMapper mapper = new ObjectMapper();
-
-		
+		System.out.println("0");
+		RestServiceHelper restHelper = new RestServiceHelper();
+		System.out.println("1");
 		ApplicantUser user = null;
 		try {
+				LOGGER.debug("COMMING AFTER TRY");
 			user = mapper.readValue(msg, ApplicantUser.class);
-			userDAO s = new userDAO();
-			s.storeApplicant(user);
+			userDAO userDAO = new userDAO();
+			LOGGER.debug("COMMING BEFORE TRY");
+			HttpSession session = req.getSession(true);
+			LOGGER.debug("AFTER SESSION OBJECT>>><<<<>"+session);
+			user.setTenant_id(restHelper.convertStringToInteger(session.getAttribute("id")+""));
+			userDAO.storeApplicant(user);
 			
 		} catch (JsonParseException e) {
 			e.printStackTrace();
@@ -697,11 +707,8 @@ System.out.println("node "+josArray );
 		}
 		LOGGER.info("-----Json is -------"+msg);
 		JSONObject  jobj=new JSONObject(msg);
-		   
-             
-     		LOGGER.info("-----VPC with  VTN Created  using  SDN -------"+msg);
-
-		 
+      		LOGGER.info("-----VPC with  VTN Created  using  SDN -------"+msg);
+ 		 
 		return null;
 	}
 	@GET
@@ -711,20 +718,17 @@ System.out.println("node "+josArray );
 
 		LOGGER.info("--------------VPC   Selected--------");
 		List<ApplicantUser> customers = new ArrayList<ApplicantUser>();
-
+		String customersList =null;
+		try {
 		userDAO customerDao = new userDAO();
 		customers = customerDao.selectApplicantName();
-		
-		
 		Gson gson = new Gson();
-	
-		
-		String customersList = gson.toJson(customers);
-		
+		customersList = gson.toJson(customers);
 		//LOGGER.info("selectApplicantName : " + customersList);
-	
+		}catch(Exception e){
+			LOGGER.error("Error when getting all data from Applications table");
+		}
 	return customersList;
-
 	}
 	
 	@GET
@@ -825,16 +829,19 @@ System.out.println("node "+josArray );
 		
 		return null;
 	}
-	
-	
-	
+	 
 	
 	@GET
 	@Path("/deleteData/{data}")
 	public void deleteData(@PathParam("data") String data) {
+		LOGGER.info("Inside (.) deleteData of Rest Service"+data);
 		
 		userDAO customerDao = new userDAO();
+		try{
 		customerDao.deleteData(data);
+		}catch(Exception e){
+			LOGGER.error("Error when deleting application ");
+		}
 	}
 	           
 	          /*UPDATE VPC DATA*/
@@ -936,14 +943,9 @@ System.out.println("node "+josArray );
 			
 			Tester.installFlow(aclName, srcIp, destIP,"DROP");
 		}
-		
-		
-		
+		 
 		//Tester.pASSactiontype("233", vpc_name, action,vpc_name,vpc_name+"vb", vpc_name+"if1");
-		
-		
-				
-		
+		 
        Acl user = null;
 		try {
 			user = mapper.readValue(aclData, Acl.class);
@@ -1018,18 +1020,11 @@ System.out.println("node "+josArray );
 		//String  srcPrefix[]=srcip.split("/");
 		//String  destPrefix[]=destip.split("/");
 	//	System.out.println("------vpc_name--------"+message1);
-		
-	
-		
-		
-		
-		
+	 
 	String vpcname=	job.get("vpc_name").toString();
-		
-		
+		 
 		System.out.println("---------------Vpc  Name  for  Json-----------"+vpcname);
-		
-		//System.out.println("--------------destip-------"+destip);
+ 		//System.out.println("--------------destip-------"+destip);
 		//System.out.println("--------------srcIP-------"+srcip);
 		 Subnet user = null;
 		try {
@@ -1073,17 +1068,6 @@ System.out.println("node "+josArray );
 //	Tester.createFlowListEntry("233", srcip , destip, vpc_name);
 	Tester.vBridgeInterfacesFlowFilter(vpc_name, vpc_name+"vb", vpc_name+"if1");
 
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	//Tester.pASSactiontype("233", vpc_name, "pass",vpc_name,vpc_name+"vb", vpc_name+"if1");
     //Tester.dRopactiontype("233", vpc_name, "drop",vpc_name,vpc_name+"vb", vpc_name+"if1");
              
@@ -1152,7 +1136,7 @@ System.out.println("node "+josArray );
 	@GET
 	@Path("/deleteSAR/{data}")
 	public void deleteSAR(@PathParam("data") String data) {
-		
+		LOGGER.info("Inside (.) deleteSAR ");
 		userDAO customerDao = new userDAO();
 		customerDao.deleteSAR(data);
 	}

@@ -311,35 +311,12 @@
                        </a>   
                         </li>
                        <li class="nav-item start ">
-                            <a href="javascript:;" class="nav-link nav-toggle">
+                            <li class="nav-item start ">
+                            <a href="#" onClick="loadpage('applicationsummary')" class="nav-link nav-toggle">
                                 <i class="icon-screen-desktop"></i>
                                 <span class="title">Applications</span>
-                                <span class="arrow"></span>
                             </a>
-                            <ul class="sub-menu">
-							<li class="nav-item start "><a href="#" class="nav-link "
-								id="applicationsummary" onClick="loadpage('step1')">
-									<span class="title">Get Started</span>
-							</a></li>
-							<li class="nav-item start ">
-                                    <a href="#" class="nav-link " id="applicationsummary"
-								onClick="loadpage('applicationsummary')">
-                                        <span class="title">Summary</span>
-                                    </a>
-                                </li>
-                                <li class="nav-item start ">
-                                    <a href="#" class="nav-link " id="applicationwebhooks"
-								onClick="loadpage('applicationwebhooks')">
-                                        <span class="title">Webhooks</span>
-                                    </a>
-                                </li>
-                                <li class="nav-item start ">
-                                    <a href="#" class="nav-link " id="environments"  onClick="loadpage('environments')">
-                                        <span class="title">Environments</span>                                        
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
+	                   </li>
                         
                         <li class="nav-item start ">
                             <a href="javascript:;" class="nav-link nav-toggle">
@@ -348,18 +325,15 @@
                                 <span class="arrow"></span>
                             </a>
                             <ul class="sub-menu">
-                                <li class="nav-item start ">
-                                    <a href="#" class="nav-link " id="vpc" onClick="loadpage('vpcwizard')">
-                                        <span class="title">VPC</span>
-                                        <span class="arrow"></span>
-                                    </a>
-                                    <ul class="sub-menu">
-									<li class="nav-item start "><a href="#" class="nav-link "
-										id="subnet" onClick="loadpage('vpc')"> <span
-											class="title">Create VPC	</span>
+                            <li class="nav-item start "><a href="#" class="nav-link "
+										id="subnet" onClick="loadpage('networkWizard')"> <span
+											class="title"> Get Started </span>
 									</a>
-									</li>
-								</ul>
+							</li>
+                                <li class="nav-item start ">
+                                    <a href="#" class="nav-link " id="vpc" onClick="loadpage('vpcinterface')">
+                                        <span class="title">VPC</span>
+                                    </a>
                                 </li>
                                 <li class="nav-item start ">
                                     <a href="#" class="nav-link " id="subnet" onClick="loadpage('subnet')">
@@ -511,15 +485,7 @@
 								<span class="arrow"></span>
 							</a>
 							
-								<ul class="sub-menu">
-									<li class="nav-item">
-										<a href="#" class="nav-link " id="imageregistry" onClick="loadpage('imageregistry')">
-                                        <span class="title">Add Image Registry</span>
-                                        <span class="arrow"></span>
-                                    </a>
-                                    
-									</li>
-								</ul>
+								
 						</li>
 						<li class="nav-item">
 							<a href="javascript:;" class="nav-link" id="allhost"onClick="loadpage('allhost')">

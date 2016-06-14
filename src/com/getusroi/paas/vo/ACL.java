@@ -4,58 +4,91 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ACL {
-	  private String srcIp;
-	  private String destIP;
-	  private String aclName;
-	  private int tenant_id;
-	  private int subnet_id;
-	public ACL(String srcIp, String destIP, String aclName, int tenant_id,
-			int subnet_id) {
+	 private int id;
+	 private String aclName;
+	 private String sourceIp;
+	 private String destinationIp;
+	 private String action;
+	 private int port;
+	 private int tenantId; 
+	
+	 public ACL() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public ACL(int id, String aclName, String sourceIp, String destinationIp,
+			String action, int port, int tenantId) {
 		super();
-		this.srcIp = srcIp;
-		this.destIP = destIP;
+		this.id = id;
 		this.aclName = aclName;
-		this.tenant_id = tenant_id;
-		this.subnet_id = subnet_id;
+		this.sourceIp = sourceIp;
+		this.destinationIp = destinationIp;
+		this.action = action;
+		this.port = port;
+		this.tenantId = tenantId;
 	}
-	public ACL() {
-		super();
-	}
+
 	@Override
 	public String toString() {
-		return "ACL [srcIp=" + srcIp + ", destIP=" + destIP + ", aclName="
-				+ aclName + ", tenant_id=" + tenant_id + ", subnet_id="
-				+ subnet_id + "]";
+		return "ACL [id=" + id + ", aclName=" + aclName + ", sourceIp="
+				+ sourceIp + ", destinationIp=" + destinationIp + ", action="
+				+ action + ", port=" + port + ", tenantId=" + tenantId + "]";
 	}
-	public String getSrcIp() {
-		return srcIp;
+
+	public int getId() {
+		return id;
 	}
-	public void setSrcIp(String srcIp) {
-		this.srcIp = srcIp;
+
+	public void setId(int id) {
+		this.id = id;
 	}
-	public String getDestIP() {
-		return destIP;
-	}
-	public void setDestIP(String destIP) {
-		this.destIP = destIP;
-	}
+
 	public String getAclName() {
 		return aclName;
 	}
+
 	public void setAclName(String aclName) {
 		this.aclName = aclName;
 	}
-	public int getTenant_id() {
-		return tenant_id;
+
+	public String getSourceIp() {
+		return sourceIp;
 	}
-	public void setTenant_id(int tenant_id) {
-		this.tenant_id = tenant_id;
+
+	public void setSourceIp(String sourceIp) {
+		this.sourceIp = sourceIp;
 	}
-	public int getSubnet_id() {
-		return subnet_id;
+
+	public String getDestinationIp() {
+		return destinationIp;
 	}
-	public void setSubnet_id(int subnet_id) {
-		this.subnet_id = subnet_id;
+
+	public void setDestinationIp(String destinationIp) {
+		this.destinationIp = destinationIp;
+	}
+
+	public String getAction() {
+		return action;
+	}
+
+	public void setAction(String action) {
+		this.action = action;
+	}
+
+	public int getPort() {
+		return port;
+	}
+
+	public void setPort(int port) {
+		this.port = port;
+	}
+
+	public int getTenantId() {
+		return tenantId;
+	}
+
+	public void setTenantId(int tenantId) {
+		this.tenantId = tenantId;
 	}
 	
 	  

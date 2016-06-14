@@ -5,136 +5,83 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>ACL  Rule</title>
+<title>Image Registry</title>
 
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Image Registry</title>
 
 <script src="../assets/global/plugins/jquery.min.js" type="text/javascript"></script>
-
 <script src="../assets/global/plugins/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
 <script src="../assets/global/scripts/angular.min.js" type="text/javascript"></script>
-<script src="../js/acl/acl.js" type="text/javascript"></script>
+<script src="../assets/pages/scripts/acl/acl.js" type="text/javascript"></script> 
 
-<link href="../assets/global/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-<link href="../assets/pages/css/table/table.css" rel="stylesheet" type="text/css" />
 <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&subset=all" rel="stylesheet" type="text/css" />
 <link href="../assets/global/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
 <link href="../assets/global/plugins/simple-line-icons/simple-line-icons.min.css" rel="stylesheet" type="text/css" />
+<link href="../assets/global/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 <link href="../assets/global/plugins/uniform/css/uniform.default.css" rel="stylesheet" type="text/css" />
-<link href="../assets/global/css/components.min.css" rel="stylesheet" id="style_components" type="text/css" />
+<link href="../assets/global/css/components.min.css" rel="stylesheet" 	id="style_components" type="text/css" />
 <link href="../assets/pages/css/layout.min.css" rel="stylesheet" type="text/css" />
 <link href="../assets/pages/css/light.min.css" rel="stylesheet" type="text/css" id="style_color" />
-<link rel="shortcut icon" href="favicon.ico" /> 
+<link rel="shortcut icon" href="favicon.ico" />
+</head>
+</head>
 
-<body>
+<body
+	class="page-container-bg-solid page-header-fixed page-sidebar-closed-hide-logo">
 
-	<div class="page-header" align="center">
-		<h1>ACL  Rule</h1>
-	</div>
+	<div data-ng-app="myAcl" data-ng-controller="MainCtrl"
+		data-ng-init="selectAcl()">
 
-	<div ng-app="myfirewall" ng-controller="MainCtrl" ng-init="selectAcl();">
-	
-		<div  class="container">
+		<div class="page-head">
+			<!-- BEGIN PAGE TITLE -->
+			<div class="page-title">
+				<h1>ACL Configuration Wizard</h1>
+			</div>
+			<!-- END PAGE TITLE -->
 
-			<button type="button" ng-click="toggleModal()" class="btn green">Add ACL</button>
+		</div>
 
-			<modal title="Add ACL" visible="showModal">
-
-			<form role="form" onsubmit="return closeSelf()">
-			<div class="form-group">
-					<label for="aclName">AClName</label> <input type="text"
-						class="form-control" id="srcIp" placeholder="aclName"
-						ng-model="field.aclName" name="aclName" />
-				</div>
-				<!-- <div class="form-group">
-					<label for="VPC_Name">Action</label>
-					<select class="form-control"ng-model="field.action" name="action">
-							<option value="pass">Pass</option>
-							<option value="deny">Deny</option>
-							<option value="deny">Redirection</option>
-							</select>
-					 
-				</div> -->
-				
-				<div class="form-group">
-					<label for="VPC_Name">Source IP</label> <input type="text"
-						class="form-control" id="srcIp" placeholder="srcIp"
-						ng-model="field.srcIp" name="srcIp" />
-				</div>
-				<div class="form-group">
-					<label for="VPC_Name">Destination IP</label> <input type="text"
-						class="form-control" id="destIP" placeholder="destIP"
-						ng-model="field.destIP" name="destIP" />
-				</div>
-				
-
-
-
-			
-
-				<div class="modal-footer" style="background: #ccefff">
-					<div class="bootstrap-dialog-footer">
-
-						 <!--   <div class="bootstrap-dialog-footer-buttons"> 
-						
-										 <button ng-click="cancel()" class="btn btn-danger btn-nirmata">Cancel</button>
-										 <script>
-										 $scope.cancel = function(){
-							            	 $modalInstance.dismiss('cancel');
-								            };
-							              </script> 
-						  <button class="btn btn-default btn-nirmata">Cancel</button>   --> 
-
-
-						<button type="button" class="btn btn-danger btn-nirmata col-xs-2" data-dismiss="modal">Cancel</button>
-					    <button class="btn btn-primary btn-nirmata"data-dismiss="modal" ng-click="regAcl();">Add</button> 
-						
-					</div>
-				</div>
-		</div> <!-- container div end -->
-
-
-	</modal>
-
-	
-	
-
-	<hr/>
-
-	<div class="container">
-		<table cellpadding="1"cellspacing="1"border="1">
-			<thead>
-				<tr>
-				<th width="200">ACLName</th>
-					<th width="200">srcIp</th>
-					<th width="200">destIP</th>
-					<th width="200">Action</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr ng-repeat="field in fields">
-				    <td>{{field.aclName}}</td>
-					<td>{{field.srcIp}}</td>
-					<td>{{field.destIP}}</td>
-					<td>{{field.action}}</td>
-					 <td><button ng-click="deleteFirewallOutbounds(field.action)"
-									class="btn btn-danger">Delete</button>
-					<button ng-click="update(field.action)" class="btn btn-primary" >Update</button></td>				
+		<hr>
+		<button OnClick=" location.href='acl_wizard.html' " class="btn green"> Add Acl </button>
+		<br>
+		<hr />
+		<div class="table-scrollable">
+			<table class="table table-bordered table-hover">
+				<thead>
+					<tr id="tableheader">
+						<th width="30%">ACL Name</th>
+						<th width="10%">Source IP</th>
+						<th width="10%">Destination IP</th>
+						<th width="20%">Action</th>
+						<th width="10%">Port</th>
+						<th width="10%">Delete</th>
+						<th width="10%">Update</th>
+					</tr>
+					</thead>
+				 	
+				<tbody>
+				<tr data-ng-repeat="val in fields">
+					<td>{{val.aclName}}</td>
+					<td>{{val.sourceIp}}</td>
+					<td>{{val.destinationIp}}</td>
+					<td>{{val.action}}</td>
+					<td>{{val.port}}</td>
+					<td align="center"><a data-ng-click="deleteAcl(val.aclName)"
+									class="btn btn-danger"><i class="fa fa-remove"></a></td>
+					 <td align="center"><a data-ng-click="updateAcl(field.name)"
+									class="btn btn-primary"><i class="fa fa-undo"></a></td>
 									
-									</td>
-					<!-- <td><button type="button"class="btn btn-danger" ng-click="remove(fld)">Delete</a></td> -->
-					<!-- <td><button ng-click="deleteData(field.vpc_name)" class="btn btn-danger" >Delete</button> -->
-					
+													
 				</tr>
-				
-			</tbody>
-			
-		</table>
-		
+				</tbody>
+				</table>
+			</div>
+
+ 
 	</div>
-
-
-</div>
-
 
 </body>
 </html>

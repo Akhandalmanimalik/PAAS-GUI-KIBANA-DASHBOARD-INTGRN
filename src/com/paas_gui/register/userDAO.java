@@ -40,6 +40,8 @@ import com.paas_gui.vpc.Vpc_pozo;
 
 public class userDAO {
 
+	private static final String GET_ALL_APPLICATIONS = "select * from applications";
+	private static final String REMOVE_APPLICATION_FROM_DB = "delete from applications where applications_name = ?";
 	/*
 	 * public static void main(String[] args) { new
 	 * userDAO().getvpcId("vpv-01"); }
@@ -49,6 +51,7 @@ public class userDAO {
 
 	final Logger LOGGER = Logger.getLogger(userDAO.class);
 	private static final String INSERTSQL = "INSERT INTO register VALUES(?,?,?,?)";
+	private static final String  INSERT_APPLICATION_DETAILS= "INSERT INTO applications(applications_name,description,tenant_id) VALUES(?,?,?)";
 	public static Logger log = Logger.getLogger(userDAO.class);
 
 	public boolean viewdata(Employee user) {
@@ -81,16 +84,14 @@ public class userDAO {
 		try {
 
 			connection = (Connection) DBConnection.getConnection();
-			String sql = "select applicantName from applicantUser";
-			preparedStatement = (PreparedStatement) connection.prepareStatement(sql);
+			preparedStatement = (PreparedStatement) connection.prepareStatement(GET_ALL_APPLICATIONS);
 			resultSet = preparedStatement.executeQuery();
 
 			ApplicantUser customer = null;
 			while (resultSet.next()) {
-
 				customer = new ApplicantUser();
-				customer.setApplicantionName(resultSet.getString(1));
-
+				customer.setApplicantionName(resultSet.getString(2));
+				customer.setDescription(resultSet.getString(3));
 				customers.add(customer);
 			}
 
@@ -476,9 +477,10 @@ public class userDAO {
 		PreparedStatement pstmt = null;
 		try {
 			con = (Connection) DBConnection.getConnection();
-			pstmt = (PreparedStatement) con.prepareStatement("INSERT INTO applicantUser VALUES(?,?)");
+			pstmt = (PreparedStatement) con.prepareStatement(INSERT_APPLICATION_DETAILS);
 			pstmt.setString(1, user.getApplicantionName());
 			pstmt.setString(2, user.getDescription());
+			pstmt.setInt(3, user.getTenant_id());
 			pstmt.executeUpdate();
 			LOGGER.info("Data Inserted");
 		} catch (SQLException sqlexp) {
@@ -550,15 +552,12 @@ public class userDAO {
 	}
 
 	public void deleteData(String data) {
-
+		LOGGER.info("Inside (.) deleteData of userDAO");
 		Connection connection = null;
 		PreparedStatement preparedStatement = null;
-
 		try {
-
 			connection = (Connection) DBConnection.getConnection();
-			String sql = "delete from vpc where vpc_name = ?";
-			preparedStatement = (PreparedStatement) connection.prepareStatement(sql);
+			preparedStatement = (PreparedStatement) connection.prepareStatement(REMOVE_APPLICATION_FROM_DB);
 			preparedStatement.setString(1, data);
 			preparedStatement.executeUpdate();
 

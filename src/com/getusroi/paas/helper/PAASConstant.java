@@ -20,5 +20,6 @@ public class PAASConstant {
 	// Error code exception constants.
 	public static final String ERROR_IN_SQL_SYNTAX = "1064";
 	public static final String TABLE_NOT_EXIST = "1146";
+	public static final String  IMAGE_RESISTRY_NAME="index.docker.io";
 
 }
